@@ -1,3 +1,4 @@
+from emberjson import serialize
 from lightbug_http.connection import TCPConnection, default_buffer_size
 from lightbug_http.header import ParsedResponseHeaders, parse_response_headers
 from lightbug_http.http.chunked import HTTPChunkedDecoder
@@ -43,6 +44,17 @@ comptime ResponseParseError = Variant[
     ResponseBodyReadError,
     ChunkedEncodingError,
 ]
+
+
+@fieldwise_init
+struct Json[T: AnyType]:
+    """Wraps a value to be serialized as a JSON HTTP response body.
+
+    Parameters:
+        T: Any struct type to serialize as JSON.
+    """
+
+    var value: T
 
 
 struct StatusCode:
@@ -288,6 +300,20 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
             self.set_content_length(len(body_bytes))
         if HeaderKey.DATE not in self.headers:
             self.headers[HeaderKey.DATE] = http_date_now()
+
+    fn __init__[T: AnyType](out self, var body: Json[T]):
+        """Serialize a typed value as JSON and return a 200 OK response.
+
+        Parameters:
+            T: Any struct type to serialize as JSON.
+
+        Args:
+            body: The Json-wrapped value to serialize.
+        """
+        self = HTTPResponse(
+            body_bytes=serialize(body.value).as_bytes(),
+            headers=Headers(Header(HeaderKey.CONTENT_TYPE, "application/json")),
+        )
 
     fn __init__(
         out self,
