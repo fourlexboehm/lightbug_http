@@ -85,7 +85,7 @@ struct ListenFailedError(CustomError, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct ListenerError(Movable, Stringable, Writable):
+struct ListenerError(Movable, Writable):
     """Error variant for listener creation operations.
 
     Represents failures during address parsing, socket creation, binding, or listening.
@@ -353,7 +353,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         return self.socket.receive(buf)
 
-    fn write(self, buf: Span[Byte]) raises SendError -> UInt:
+    fn write(self, buf: Span[Byte, _]) raises SendError -> UInt:
         """Write all data to the TCP connection, handling partial sends.
 
         Args:
@@ -461,7 +461,7 @@ struct UDPConnection[
 
         return self.socket.receive_from(dest)
 
-    fn write_to(mut self, src: Span[Byte], mut address: UDPAddr) raises SendtoError -> UInt:
+    fn write_to(mut self, src: Span[Byte, _], mut address: UDPAddr) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -477,7 +477,7 @@ struct UDPConnection[
 
         return self.socket.send_to(src, address.ip, address.port)
 
-    fn write_to(mut self, src: Span[Byte], mut host: String, port: UInt16) raises SendtoError -> UInt:
+    fn write_to(mut self, src: Span[Byte, _], mut host: String, port: UInt16) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -529,7 +529,7 @@ struct UDPConnection[
 
 
 @fieldwise_init
-struct CreateConnectionError(Movable, Stringable, Writable):
+struct CreateConnectionError(Movable, Writable):
     """Error variant for create_connection operations.
     Can be CSocketError from socket creation or SocketConnectError from connect.
     """

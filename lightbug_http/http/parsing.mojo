@@ -17,7 +17,7 @@ struct HTTPHeader(Copyable):
 
 
 @fieldwise_init
-struct ParseError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct ParseError(Movable, Writable, TrivialRegisterPassable):
     """Invalid HTTP syntax error."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -28,7 +28,7 @@ struct ParseError(Movable, Stringable, Writable, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct IncompleteError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct IncompleteError(Movable, Writable, TrivialRegisterPassable):
     """Need more data to complete parsing."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -39,7 +39,7 @@ struct IncompleteError(Movable, Stringable, Writable, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct HTTPParseError(Movable, Stringable, Writable):
+struct HTTPParseError(Movable, Writable):
     """Error variant for HTTP parsing operations."""
 
     comptime type = Variant[ParseError, IncompleteError]

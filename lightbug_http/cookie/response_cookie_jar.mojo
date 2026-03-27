@@ -9,7 +9,7 @@ from lightbug_http.cookie.cookie import InvalidCookieError
 
 
 @fieldwise_init
-struct CookieParseError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct CookieParseError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when a cookie header string fails to parse."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -56,7 +56,7 @@ struct ResponseCookieKey(ImplicitlyCopyable, KeyElement):
 
 
 @fieldwise_init
-struct ResponseCookieJar(Copyable, Sized, Stringable, Writable):
+struct ResponseCookieJar(Copyable, Sized, Writable):
     var _inner: Dict[ResponseCookieKey, Cookie]
 
     fn __init__(out self):

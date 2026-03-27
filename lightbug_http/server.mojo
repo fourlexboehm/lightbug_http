@@ -26,7 +26,7 @@ from lightbug_http.http import HTTPRequest, HTTPResponse, encode
 
 
 @fieldwise_init
-struct ServerError(Movable, Stringable, Writable):
+struct ServerError(Movable, Writable):
     """Error variant for server operations."""
 
     comptime type = Variant[
@@ -203,7 +203,7 @@ struct ProvisionPoolExhaustedError(CustomError, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct ProvisionError(Movable, Stringable, Writable):
+struct ProvisionError(Movable, Writable):
     """Error variant for provision pool operations."""
 
     comptime type = Variant[ProvisionPoolExhaustedError]

@@ -8,7 +8,7 @@ from memory import stack_allocation
 
 
 @fieldwise_init
-struct ShutdownOption(Copyable, Equatable, Stringable, Writable, TrivialRegisterPassable):
+struct ShutdownOption(Copyable, Equatable, Writable, TrivialRegisterPassable):
     var value: c_int
     comptime SHUT_RD = Self(0)
     comptime SHUT_WR = Self(1)
@@ -36,7 +36,7 @@ comptime SOL_SOCKET = 0xFFFF
 # TODO: These are probably platform specific, on MacOS I have these values, but we should check on Linux.
 # Taken from: https://github.com/openbsd/src/blob/master/sys/sys/socket.h
 @fieldwise_init
-struct SocketOption(Copyable, Equatable, Stringable, Writable, TrivialRegisterPassable):
+struct SocketOption(Copyable, Equatable, Writable, TrivialRegisterPassable):
     var value: c_int
     comptime SO_DEBUG = Self(0x0001)
     comptime SO_ACCEPTCONN = Self(0x0002)
@@ -139,7 +139,7 @@ comptime O_CLOEXEC = 524288
 
 # Socket Type constants
 @fieldwise_init
-struct SocketType(Copyable, Equatable, Stringable, Writable, TrivialRegisterPassable):
+struct SocketType(Copyable, Equatable, Writable, TrivialRegisterPassable):
     var value: c_int
     comptime SOCK_STREAM = Self(1)
     comptime SOCK_DGRAM = Self(2)
@@ -354,7 +354,7 @@ fn _getsockopt[
     socket: c_int,
     level: c_int,
     option_name: c_int,
-    option_value: ImmutUnsafePointer[c_void],
+    option_value: ImmutUnsafePointer[c_void, _],
     option_len: Pointer[socklen_t, origin],
 ) -> c_int:
     """Libc POSIX `getsockopt` function.
@@ -447,7 +447,7 @@ fn getsockopt(
 
 fn _getsockname[
     origin: MutOrigin
-](socket: c_int, address: MutUnsafePointer[sockaddr], address_len: Pointer[socklen_t, origin],) -> c_int:
+](socket: c_int, address: MutUnsafePointer[sockaddr, _], address_len: Pointer[socklen_t, origin],) -> c_int:
     """Libc POSIX `getsockname` function.
 
     Args:
@@ -516,7 +516,7 @@ fn getsockname(socket: FileDescriptor, mut address: SocketAddress) raises Getsoc
 
 fn _getpeername[
     origin: MutOrigin
-](sockfd: c_int, addr: MutUnsafePointer[sockaddr], address_len: Pointer[socklen_t, origin],) -> c_int:
+](sockfd: c_int, addr: MutUnsafePointer[sockaddr, _], address_len: Pointer[socklen_t, origin],) -> c_int:
     """Libc POSIX `getpeername` function.
 
     Args:
@@ -924,7 +924,7 @@ fn connect(socket: FileDescriptor, mut address: SocketAddress) raises ConnectErr
 
 fn _recv(
     socket: c_int,
-    buffer: MutUnsafePointer[c_void],
+    buffer: MutUnsafePointer[c_void, _],
     length: c_size_t,
     flags: c_int,
 ) -> c_ssize_t:
@@ -1012,10 +1012,10 @@ fn _recvfrom[
     origin: MutOrigin
 ](
     socket: c_int,
-    buffer: MutUnsafePointer[c_void],
+    buffer: MutUnsafePointer[c_void, _],
     length: c_size_t,
     flags: c_int,
-    address: MutUnsafePointer[sockaddr],
+    address: MutUnsafePointer[sockaddr, _],
     address_len: Pointer[socklen_t, origin],
 ) -> c_ssize_t:
     """Libc POSIX `recvfrom` function.
@@ -1142,7 +1142,7 @@ fn recvfrom[
 
 fn _send(
     socket: c_int,
-    buffer: ImmutUnsafePointer[c_void],
+    buffer: ImmutUnsafePointer[c_void, _],
     length: c_size_t,
     flags: c_int,
 ) -> c_ssize_t:
@@ -1258,10 +1258,10 @@ fn send[
 
 fn _sendto(
     socket: c_int,
-    message: ImmutUnsafePointer[c_void],
+    message: ImmutUnsafePointer[c_void, _],
     length: c_size_t,
     flags: c_int,
-    dest_addr: ImmutUnsafePointer[sockaddr],
+    dest_addr: ImmutUnsafePointer[sockaddr, _],
     dest_len: socklen_t,
 ) -> c_ssize_t:
     """Libc POSIX `sendto` function

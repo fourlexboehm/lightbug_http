@@ -3,7 +3,7 @@ from utils import Variant
 
 
 @fieldwise_init
-struct InvalidCookieError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct InvalidCookieError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when a cookie is invalid."""
 
     fn write_to[W: Writer, //](self, mut writer: W):

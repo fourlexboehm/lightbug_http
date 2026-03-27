@@ -135,7 +135,7 @@ struct StatusCode:
 
 
 @fieldwise_init
-struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
+struct HTTPResponse(Encodable, Movable, Sized, Writable):
     var headers: Headers
     var cookies: ResponseCookieJar
     var body_raw: Bytes
@@ -145,7 +145,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
     var protocol: String
 
     @staticmethod
-    fn from_bytes(b: Span[Byte]) raises ResponseParseError -> HTTPResponse:
+    fn from_bytes(b: Span[Byte, _]) raises ResponseParseError -> HTTPResponse:
         var cookies = ResponseCookieJar()
 
         var properties: ParsedResponseHeaders
@@ -179,7 +179,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
             raise ResponseParseError(ResponseBodyReadError(detail=String(body_err)))
 
     @staticmethod
-    fn from_bytes(b: Span[Byte], conn: TCPConnection) raises ResponseParseError -> HTTPResponse:
+    fn from_bytes(b: Span[Byte, _], conn: TCPConnection) raises ResponseParseError -> HTTPResponse:
         var cookies = ResponseCookieJar()
 
         var properties: ParsedResponseHeaders
@@ -279,7 +279,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
 
     fn __init__(
         out self,
-        body_bytes: Span[Byte],
+        body_bytes: Span[Byte, _],
         headers: Headers = Headers(),
         cookies: ResponseCookieJar = ResponseCookieJar(),
         status_code: Int = 200,
@@ -391,7 +391,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
         except e:
             raise Error(String(e))
 
-    fn read_chunks(mut self, chunks: Span[Byte]) raises:
+    fn read_chunks(mut self, chunks: Span[Byte, _]) raises:
         var reader = ByteReader(chunks)
         while True:
             var size = atol(String(reader.read_line()), 16)

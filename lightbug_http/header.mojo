@@ -109,7 +109,7 @@ struct HeaderKey:
 
 
 @fieldwise_init
-struct HeaderKeyNotFoundError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct HeaderKeyNotFoundError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when a header key is not found."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -120,7 +120,7 @@ struct HeaderKeyNotFoundError(Movable, Stringable, Writable, TrivialRegisterPass
 
 
 @fieldwise_init
-struct InvalidHTTPRequestError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct InvalidHTTPRequestError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when the HTTP request is malformed."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -131,7 +131,7 @@ struct InvalidHTTPRequestError(Movable, Stringable, Writable, TrivialRegisterPas
 
 
 @fieldwise_init
-struct IncompleteHTTPRequestError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct IncompleteHTTPRequestError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when the HTTP request is incomplete (need more data)."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -142,7 +142,7 @@ struct IncompleteHTTPRequestError(Movable, Stringable, Writable, TrivialRegister
 
 
 @fieldwise_init
-struct InvalidHTTPResponseError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct InvalidHTTPResponseError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when the HTTP response is malformed."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -153,7 +153,7 @@ struct InvalidHTTPResponseError(Movable, Stringable, Writable, TrivialRegisterPa
 
 
 @fieldwise_init
-struct IncompleteHTTPResponseError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct IncompleteHTTPResponseError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when the HTTP response is incomplete."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -164,7 +164,7 @@ struct IncompleteHTTPResponseError(Movable, Stringable, Writable, TrivialRegiste
 
 
 @fieldwise_init
-struct EmptyBufferError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct EmptyBufferError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when buffer has no data available."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -175,7 +175,7 @@ struct EmptyBufferError(Movable, Stringable, Writable, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct RequestParseError(Movable, Stringable, Writable):
+struct RequestParseError(Movable, Writable):
     """Error variant for HTTP request parsing.
 
     Can be InvalidHTTPRequestError, IncompleteHTTPRequestError, or EmptyBufferError.
@@ -219,7 +219,7 @@ struct RequestParseError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct ResponseParseError(Movable, Stringable, Writable):
+struct ResponseParseError(Movable, Writable):
     """Error variant for HTTP response parsing."""
 
     comptime type = Variant[InvalidHTTPResponseError, IncompleteHTTPResponseError, EmptyBufferError]
@@ -304,7 +304,7 @@ struct ParsedResponseHeaders(Movable):
 
 
 @fieldwise_init
-struct Header(Copyable, Stringable, Writable):
+struct Header(Copyable, Writable):
     """A single HTTP header key-value pair."""
 
     var key: String
@@ -386,7 +386,7 @@ fn write_header_latin1(mut writer: ByteWriter, key: String, value: String):
 
 
 @fieldwise_init
-struct Headers(Copyable, Stringable, Writable):
+struct Headers(Copyable, Writable):
     """Collection of HTTP headers.
 
     Header keys are normalized to lowercase for case-insensitive lookup.
@@ -458,7 +458,7 @@ struct Headers(Copyable, Stringable, Writable):
 
 
 fn parse_request_headers(
-    buffer: Span[Byte],
+    buffer: Span[Byte, _],
     last_len: Int = 0,
 ) raises RequestParseError -> ParsedRequestHeaders:
     """Parse HTTP request headers from a buffer.
@@ -531,7 +531,7 @@ fn parse_request_headers(
 
 
 fn parse_response_headers(
-    buffer: Span[Byte],
+    buffer: Span[Byte, _],
     last_len: Int = 0,
 ) raises ResponseParseError -> ParsedResponseHeaders:
     """Parse HTTP response headers from a buffer.
@@ -610,7 +610,7 @@ fn parse_response_headers(
     )
 
 
-fn find_header_end(buffer: Span[Byte], search_start: Int = 0) -> Optional[Int]:
+fn find_header_end(buffer: Span[Byte, _], search_start: Int = 0) -> Optional[Int]:
     """Find the end of HTTP headers in a buffer.
 
     Searches for the \\r\\n\\r\\n sequence that marks the end of headers.

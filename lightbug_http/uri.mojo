@@ -85,7 +85,7 @@ struct PortBounds:
 
 
 @fieldwise_init
-struct Scheme(Equatable, Hashable, ImplicitlyCopyable, Representable, Stringable, Writable):
+struct Scheme(Equatable, Hashable, ImplicitlyCopyable, Writable):
     var value: UInt8
     comptime HTTP = Self(0)
     comptime HTTPS = Self(1)
@@ -109,7 +109,7 @@ struct Scheme(Equatable, Hashable, ImplicitlyCopyable, Representable, Stringable
         return String.write(self)
 
 
-struct URIParseError(Stringable, Writable):
+struct URIParseError(Writable):
     var message: String
 
     fn __init__(out self, var message: String):
@@ -123,7 +123,7 @@ struct URIParseError(Stringable, Writable):
 
 
 @fieldwise_init
-struct URI(Copyable, Representable, Stringable, Writable):
+struct URI(Copyable, Writable):
     var _original_path: String
     var scheme: String
     var path: String

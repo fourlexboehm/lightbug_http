@@ -32,7 +32,7 @@ struct ByteWriter(Writer):
         self._inner = Bytes(capacity=capacity)
 
     @always_inline
-    fn write_string(mut self, bytes: Span[Byte]) -> None:
+    fn write_string(mut self, bytes: Span[Byte, _]) -> None:
         """Writes the contents of `bytes` into the internal buffer.
 
         Args:
@@ -69,7 +69,7 @@ struct ByteWriter(Writer):
         return self._inner^
 
 
-struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Stringable):
+struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized):
     """Convenience wrapper around a Span of Bytes."""
 
     var _inner: Span[Byte, Self.origin]
@@ -90,7 +90,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return True
         return False
 
-    fn __contains__(self, b: Span[Byte]) -> Bool:
+    fn __contains__(self, b: Span[Byte, _]) -> Bool:
         if len(b) > len(self._inner):
             return False
 
@@ -125,7 +125,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return False
         return True
 
-    fn __eq__(self, other: Span[Byte]) -> Bool:
+    fn __eq__(self, other: Span[Byte, _]) -> Bool:
         # both empty
         if not self._inner and not other:
             return True
@@ -148,7 +148,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return False
         return True
 
-    fn __ne__(self, other: Span[Byte]) -> Bool:
+    fn __ne__(self, other: Span[Byte, _]) -> Bool:
         return not self == other
 
     fn __iter__(self) -> _SpanIter[Byte, Self.origin]:
@@ -174,7 +174,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
 
 
 @fieldwise_init
-struct OutOfBoundsError(Stringable, Writable):
+struct OutOfBoundsError(Writable):
     var message: String
 
     fn __init__(out self):
@@ -188,7 +188,7 @@ struct OutOfBoundsError(Stringable, Writable):
 
 
 @fieldwise_init
-struct EndOfReaderError(Stringable, Writable):
+struct EndOfReaderError(Writable):
     var message: String
 
     fn __init__(out self):

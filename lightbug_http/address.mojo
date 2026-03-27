@@ -37,8 +37,6 @@ trait Addr(
     Defaultable,
     Equatable,
     ImplicitlyCopyable,
-    Representable,
-    Stringable,
     Writable,
 ):
     comptime _type: StaticString
@@ -685,12 +683,12 @@ fn parse_address[
     # TODO (Mikhail): StringSlice does byte level slicing, so this can be
     # invalid for multi-byte UTF-8 characters. Perhaps we instead assert that it's
     # an ascii string instead.
-    if address[0:1] == "[":
+    if address[byte=0:1] == "[":
         var bracket_offset: UInt16
         (host, bracket_offset) = parse_ipv6_bracketed_address(address)
         validate_no_brackets(address, bracket_offset)
     else:
-        host = address[:colon_index]
+        host = address[byte=:colon_index]
         if host.find(":") != -1:
             raise ParseError(ParseTooManyColonsError())
 

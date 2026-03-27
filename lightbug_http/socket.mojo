@@ -73,7 +73,7 @@ struct EOF(Movable, TrivialRegisterPassable):
 
 
 @fieldwise_init
-struct InvalidCloseErrorConversionError(Movable, Stringable, Writable, TrivialRegisterPassable):
+struct InvalidCloseErrorConversionError(Movable, Writable, TrivialRegisterPassable):
     fn write_to[W: Writer, //](self, mut writer: W):
         writer.write("InvalidCloseErrorConversionError: Cannot convert EBADF to FatalCloseError")
 
@@ -82,7 +82,7 @@ struct InvalidCloseErrorConversionError(Movable, Stringable, Writable, TrivialRe
 
 
 @fieldwise_init
-struct SocketRecvError(Movable, Stringable, Writable):
+struct SocketRecvError(Movable, Writable):
     """Error variant for socket receive operations.
     Can be RecvError from the syscall or EOF if connection closed cleanly.
     """
@@ -115,7 +115,7 @@ struct SocketRecvError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketRecvfromError(Movable, Stringable, Writable):
+struct SocketRecvfromError(Movable, Writable):
     """Error variant for socket recvfrom operations.
     Can be RecvfromError from the syscall or EOF if connection closed cleanly.
     """
@@ -148,7 +148,7 @@ struct SocketRecvfromError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketAcceptError(Movable, Stringable, Writable):
+struct SocketAcceptError(Movable, Writable):
     """Error variant for socket accept operations.
     Can be AcceptError or GetpeernameError from the syscall, SocketClosedError, or InetNtopError from binary_ip_to_string.
     """
@@ -193,7 +193,7 @@ struct SocketAcceptError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketBindError(Movable, Stringable, Writable):
+struct SocketBindError(Movable, Writable):
     """Error variant for socket bind operations.
     Can be BindError from bind(), SocketGetsocknameError from get_sock_name(), or InetPtonError from inet_pton.
     """
@@ -232,7 +232,7 @@ struct SocketBindError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketConnectError(Movable, Stringable, Writable):
+struct SocketConnectError(Movable, Writable):
     """Error variant for socket connect operations.
     Can be ConnectError from the syscall or SocketAcceptError from get_peer_name.
     """
@@ -265,7 +265,7 @@ struct SocketConnectError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketGetsocknameError(Movable, Stringable, Writable):
+struct SocketGetsocknameError(Movable, Writable):
     """Error variant for socket getsockname operations.
     Can be GetsocknameError from the syscall, SocketClosedError, or InetNtopError from binary_ip_to_string.
     """
@@ -304,7 +304,7 @@ struct SocketGetsocknameError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct FatalCloseError(Movable, Stringable, Writable):
+struct FatalCloseError(Movable, Writable):
     """Error type for Socket.close() that excludes EBADF.
 
     EBADF is excluded because it indicates the socket is already closed,
@@ -361,7 +361,7 @@ struct Socket[
     address: Addr,
     sock_type: SocketType = SocketType.SOCK_STREAM,
     address_family: AddressFamily = AddressFamily.AF_INET,
-](Movable, Representable, Stringable, Writable):
+](Movable, Writable):
     """Represents a network file descriptor. Wraps around a file descriptor and provides network functions.
 
     Parameters:
@@ -624,10 +624,10 @@ struct Socket[
         var remote = self.get_peer_name()
         self.remote_address = Self.address(remote[0], remote[1])
 
-    fn send(self, buffer: Span[Byte]) raises SendError -> UInt:
+    fn send(self, buffer: Span[Byte, _]) raises SendError -> UInt:
         return send(self.fd, buffer, UInt(len(buffer)), 0)
 
-    fn send_to(self, src: Span[Byte], mut host: String, port: UInt16) raises -> UInt:
+    fn send_to(self, src: Span[Byte, _], mut host: String, port: UInt16) raises -> UInt:
         """Send data to the a remote address by connecting to the remote socket before sending.
         The socket must be not already be connected to a remote socket.
 

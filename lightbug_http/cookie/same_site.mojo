@@ -1,5 +1,5 @@
 @fieldwise_init
-struct SameSite(Copyable, Stringable):
+struct SameSite(Copyable, ImplicitlyCopyable, Writable):
     var value: UInt8
 
     comptime none = SameSite(0)
@@ -23,10 +23,13 @@ struct SameSite(Copyable, Stringable):
     fn __eq__(self, other: Self) -> Bool:
         return self.value == other.value
 
-    fn __str__(self) -> String:
+    fn write_to[W: Writer, //](self, mut writer: W):
         if self.value == 0:
-            return materialize[SameSite.NONE]()
+            writer.write(SameSite.NONE)
         elif self.value == 1:
-            return materialize[SameSite.LAX]()
+            writer.write(SameSite.LAX)
         else:
-            return materialize[SameSite.STRICT]()
+            writer.write(SameSite.STRICT)
+
+    fn __str__(self) -> String:
+        return String.write(self)

@@ -260,8 +260,8 @@ struct addrinfo(TrivialRegisterPassable):
 
 fn _inet_ntop(
     af: c_int,
-    src: ImmutUnsafePointer[c_void],
-    dst: MutUnsafePointer[c_char],
+    src: ImmutUnsafePointer[c_void, _],
+    dst: MutUnsafePointer[c_char, _],
     size: socklen_t,
 ) raises -> ExternalImmutUnsafePointer[c_char]:
     """Libc POSIX `inet_ntop` function.
@@ -344,7 +344,7 @@ fn inet_ntop[
     return String(unsafe_from_utf8_ptr=dst.unsafe_ptr())
 
 
-fn _inet_pton(af: c_int, src: ImmutUnsafePointer[c_char], dst: MutUnsafePointer[c_void]) -> c_int:
+fn _inet_pton(af: c_int, src: ImmutUnsafePointer[c_char, _], dst: MutUnsafePointer[c_void, _]) -> c_int:
     """Libc POSIX `inet_pton` function. Converts a presentation format address (that is, printable form as held in a character string)
     to network format (usually a struct in_addr or some other internal binary representation, in network byte order).
     It returns 1 if the address was valid for the specified address family, or 0 if the address was not parseable in the specified address family,

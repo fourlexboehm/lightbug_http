@@ -6,7 +6,7 @@ from small_time.small_time import parse_time_with_format
 
 
 @fieldwise_init
-struct RequestCookieJar(Copyable, Stringable, Writable):
+struct RequestCookieJar(Copyable, Writable):
     var _inner: Dict[String, String]
 
     fn __init__(out self):

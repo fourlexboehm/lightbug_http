@@ -69,7 +69,7 @@ comptime strSlash = "/"
 
 
 @fieldwise_init
-struct HTTPRequest(Copyable, Encodable, Stringable, Writable):
+struct HTTPRequest(Copyable, Encodable, Writable):
     """Represents a parsed HTTP request.
 
     This type is constructed from already-parsed components. The server is responsible

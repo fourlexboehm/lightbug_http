@@ -171,7 +171,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         return len(self) > 0
 
     @no_inline
-    fn __str__[U: Representable & Movable, //](self: OwningList[U, *_]) -> String:
+    fn __str__[U: Writable & Movable, //](self: OwningList[U, *_]) -> String:
         """Returns a string representation of a `List`.
 
         When the compiler supports conditional methods, then a simple `String(my_list)` will
@@ -181,7 +181,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
 
         Parameters:
             U: The type of the elements in the list. Must implement the
-              traits `Representable` and `Movable`.
+              traits `Writable` and `Movable`.
 
         Returns:
             A string representation of the list.
@@ -191,12 +191,12 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         return output^
 
     @no_inline
-    fn write_to[W: Writer, U: Representable & Movable, //](self: OwningList[U, *_], mut writer: W):
+    fn write_to[W: Writer, U: Writable & Movable, //](self: OwningList[U, *_], mut writer: W):
         """Write `my_list.__str__()` to a `Writer`.
 
         Parameters:
             W: A type conforming to the Writable trait.
-            U: The type of the List elements. Must have the trait `Representable & Movable`.
+            U: The type of the List elements. Must have the trait `Writable & Movable`.
 
         Args:
             writer: The object to write to.
@@ -209,7 +209,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         writer.write("]")
 
     @no_inline
-    fn __repr__[U: Representable & Movable, //](self: OwningList[U, *_]) -> String:
+    fn __repr__[U: Writable & Movable, //](self: OwningList[U, *_]) -> String:
         """Returns a string representation of a `List`.
 
         Note that since we can't condition methods on a trait yet,
@@ -227,7 +227,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
 
         Parameters:
             U: The type of the elements in the list. Must implement the
-              traits `Representable` and `Movable`.
+              traits `Writable` and `Movable`.
 
         Returns:
             A string representation of the list.
