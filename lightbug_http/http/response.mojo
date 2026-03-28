@@ -46,15 +46,17 @@ comptime ResponseParseError = Variant[
 ]
 
 
-@fieldwise_init
-struct Json[T: AnyType]:
+struct Json[T: Movable]:
     """Wraps a value to be serialized as a JSON HTTP response body.
 
     Parameters:
         T: Any struct type to serialize as JSON.
     """
 
-    var value: T
+    var value: Self.T
+
+    fn __init__(out self, owned value: Self.T):
+        self.value = value^
 
 
 struct StatusCode:

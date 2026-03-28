@@ -281,7 +281,7 @@ fn parse_headers[
         get_token_to_eol(buf, value, value_len)
 
         while value_len > 0:
-            var c = value[value_len - 1 : value_len]
+            var c = value[byte=value_len - 1 : value_len]
             ref c_byte = c.as_bytes()[0]
             if c_byte != BytesConstant.whitespace and c_byte != BytesConstant.TAB:
                 break

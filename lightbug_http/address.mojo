@@ -580,7 +580,7 @@ fn parse_ipv6_bracketed_address[
     Returns:
         Tuple of (host, colon_index_offset).
     """
-    if address[0:1] != StringSlice("["):
+    if address[byte=0:1] != StringSlice("["):
         return address, UInt16(0)
 
     var end_bracket_index = address.find("]")
@@ -591,10 +591,10 @@ fn parse_ipv6_bracketed_address[
         raise ParseError(ParseMissingPortError())
 
     var colon_index = end_bracket_index + 1
-    if address[colon_index : colon_index + 1] != StringSlice(":"):
+    if address[byte=colon_index : colon_index + 1] != StringSlice(":"):
         raise ParseError(ParseMissingPortError())
 
-    return address[1:end_bracket_index], UInt16(end_bracket_index + 1)
+    return address[byte=1:end_bracket_index], UInt16(end_bracket_index + 1)
 
 
 fn validate_no_brackets[
@@ -604,9 +604,9 @@ fn validate_no_brackets[
     var segment: StringSlice[origin]
 
     if end_idx is None:
-        segment = address[Int(start_idx) :]
+        segment = address[byte=Int(start_idx) :]
     else:
-        segment = address[Int(start_idx) : Int(end_idx.value())]
+        segment = address[byte=Int(start_idx) : Int(end_idx.value())]
 
     if segment.find("[") != -1:
         raise ParseError(ParseUnexpectedBracketError())

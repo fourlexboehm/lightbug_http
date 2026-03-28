@@ -69,7 +69,7 @@ struct ByteWriter(Writer):
         return self._inner^
 
 
-struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized):
+struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writable):
     """Convenience wrapper around a Span of Bytes."""
 
     var _inner: Span[Byte, Self.origin]
@@ -110,8 +110,11 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized):
     fn __getitem__(self, slc: ContiguousSlice) -> Self:
         return Self(self._inner[slc])
 
+    fn write_to[W: Writer, //](self, mut writer: W):
+        writer.write(StringSlice(unsafe_from_utf8=self._inner))
+
     fn __str__(self) -> String:
-        return String(unsafe_from_utf8=self._inner)
+        return String.write(self)
 
     fn __eq__(self, other: Self) -> Bool:
         # both empty

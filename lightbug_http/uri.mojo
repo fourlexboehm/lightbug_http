@@ -19,7 +19,7 @@ fn unquote[expand_plus: Bool = False](input_str: String, disallowed_escapes: Lis
     var str_bytes = List[UInt8]()
     while current_idx < len(percent_idxs):
         var slice_end = percent_idxs[current_idx]
-        sub_strings.append(String(encoded_str[slice_start:slice_end]))
+        sub_strings.append(String(encoded_str[byte=slice_start:slice_end]))
 
         var current_offset = slice_end
         while current_idx < len(percent_idxs):
@@ -29,7 +29,7 @@ fn unquote[expand_plus: Bool = False](input_str: String, disallowed_escapes: Lis
 
             try:
                 char_byte = atol(
-                    encoded_str[current_offset + 1 : current_offset + 3],
+                    encoded_str[byte=current_offset + 1 : current_offset + 3],
                     base=16,
                 )
                 str_bytes.append(UInt8(char_byte))
@@ -54,7 +54,7 @@ fn unquote[expand_plus: Bool = False](input_str: String, disallowed_escapes: Lis
         slice_start = current_offset
         current_idx += 1
 
-    sub_strings.append(String(encoded_str[slice_start:]))
+    sub_strings.append(String(encoded_str[byte=slice_start:]))
 
     return StaticString("").join(sub_strings)
 
