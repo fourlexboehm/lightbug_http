@@ -1,6 +1,6 @@
 from lightbug_http.io.bytes import ByteReader, Bytes, create_string_from_ptr
 from lightbug_http.strings import BytesConstant, is_printable_ascii, is_token_char
-from utils import Variant
+from std.utils import Variant
 
 
 struct HTTPHeader(Copyable):

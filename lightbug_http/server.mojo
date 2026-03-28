@@ -20,7 +20,7 @@ from lightbug_http.service import HTTPService
 from lightbug_http.socket import EOF, FatalCloseError, SocketAcceptError, SocketClosedError, SocketRecvError
 from lightbug_http.utils.error import CustomError
 from lightbug_http.utils.owning_list import OwningList
-from utils import Variant
+from std.utils import Variant
 
 from lightbug_http.http import HTTPRequest, HTTPResponse, encode
 

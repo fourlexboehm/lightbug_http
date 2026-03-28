@@ -1,6 +1,6 @@
 from lightbug_http import Welcome
 from lightbug_http.server import Server
-from os.env import getenv
+from std.os.env import getenv
 
 
 fn main() raises:

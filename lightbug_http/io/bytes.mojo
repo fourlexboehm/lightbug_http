@@ -1,9 +1,9 @@
-from sys import size_of
+from std.sys import size_of
 
 from lightbug_http.connection import default_buffer_size
 from lightbug_http.strings import BytesConstant
-from memory import memcpy
-from memory.span import ContiguousSlice, _SpanIter
+from std.memory import memcpy
+from std.memory.span import ContiguousSlice, _SpanIter
 
 
 comptime Bytes = List[Byte]

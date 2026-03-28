@@ -1,10 +1,10 @@
-from collections import Optional
-from collections._asan_annotations import __sanitizer_annotate_contiguous_container
-from os import abort
-from sys import size_of
-from sys.intrinsics import _type_is_eq
+from std.collections import Optional
+from std.collections._asan_annotations import __sanitizer_annotate_contiguous_container
+from std.os import abort
+from std.sys import size_of
+from std.sys.intrinsics import _type_is_eq
 
-from memory import Pointer, Span, memcpy
+from std.memory import Pointer, Span, memcpy
 
 
 # ===-----------------------------------------------------------------------===#

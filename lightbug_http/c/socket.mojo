@@ -1,10 +1,10 @@
-from ffi import c_int, c_size_t, c_ssize_t, c_uchar, external_call, get_errno
-from sys.info import CompilationTarget, size_of
+from std.ffi import c_int, c_size_t, c_ssize_t, c_uchar, external_call, get_errno
+from std.sys.info import CompilationTarget, size_of
 
 from lightbug_http.c.aliases import c_void
 from lightbug_http.c.network import SocketAddress, sockaddr, sockaddr_in, socklen_t
 from lightbug_http.c.socket_error import *
-from memory import stack_allocation
+from std.memory import stack_allocation
 
 
 @fieldwise_init

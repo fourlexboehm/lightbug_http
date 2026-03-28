@@ -1,5 +1,5 @@
-from sys.info import CompilationTarget
-from time import sleep
+from std.sys.info import CompilationTarget
+from std.time import sleep
 
 from lightbug_http.address import HostPort, NetworkType, ParseError, TCPAddr, UDPAddr, parse_address
 from lightbug_http.c.address import AddressFamily
@@ -31,7 +31,7 @@ from lightbug_http.socket import (
     UDPSocket,
 )
 from lightbug_http.utils.error import CustomError
-from utils import Variant
+from std.utils import Variant
 
 
 comptime default_buffer_size = 4096

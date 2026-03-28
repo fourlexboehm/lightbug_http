@@ -6,7 +6,7 @@ from lightbug_http.http.date import http_date_now
 from lightbug_http.io.bytes import ByteReader, Bytes, ByteWriter, byte
 from lightbug_http.strings import CR, LF, http, lineBreak, strHttp11, whitespace
 from lightbug_http.uri import URI
-from utils import Variant
+from std.utils import Variant
 
 
 @fieldwise_init

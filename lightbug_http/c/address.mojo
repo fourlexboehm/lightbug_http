@@ -1,4 +1,4 @@
-from ffi import c_int
+from std.ffi import c_int
 
 from lightbug_http.c.aliases import ExternalImmutUnsafePointer, ExternalMutUnsafePointer, c_void
 

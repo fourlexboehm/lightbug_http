@@ -1,5 +1,5 @@
-from ffi import c_uint
-from sys.info import CompilationTarget
+from std.ffi import c_uint
+from std.sys.info import CompilationTarget
 
 from lightbug_http.address import (
     Addr,
@@ -59,7 +59,7 @@ from lightbug_http.c.socket_error import (
 from lightbug_http.c.socket_error import SocketError as CSocketError
 from lightbug_http.connection import default_buffer_size
 from lightbug_http.io.bytes import Bytes
-from utils import Variant
+from std.utils import Variant
 
 
 @fieldwise_init

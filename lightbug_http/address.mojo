@@ -1,4 +1,4 @@
-from ffi import CompilationTarget, c_char, c_int, c_uchar, external_call
+from std.ffi import CompilationTarget, c_char, c_int, c_uchar, external_call
 
 from lightbug_http.c.address import AddressFamily, AddressLength
 from lightbug_http.c.aliases import ExternalImmutUnsafePointer, ExternalMutUnsafePointer, c_void
@@ -15,7 +15,7 @@ from lightbug_http.c.network import (
 from lightbug_http.c.socket import SocketType, socket
 from lightbug_http.socket import Socket
 from lightbug_http.utils.error import CustomError
-from utils import Variant
+from std.utils import Variant
 
 
 comptime MAX_PORT = 65535

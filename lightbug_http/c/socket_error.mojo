@@ -5,7 +5,7 @@ Follows the pattern from typed_errors.mojo.
 """
 
 from lightbug_http.utils.error import CustomError
-from utils import Variant
+from std.utils import Variant
 
 
 # Accept errors

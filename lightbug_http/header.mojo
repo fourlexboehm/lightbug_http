@@ -6,8 +6,8 @@ from lightbug_http.http.parsing import (
 )
 from lightbug_http.io.bytes import ByteReader, Bytes, ByteWriter, byte, is_newline, is_space
 from lightbug_http.strings import CR, LF, BytesConstant, lineBreak
-from memory import Span
-from utils import Variant
+from std.memory import Span
+from std.utils import Variant
 
 
 struct HeaderKey:

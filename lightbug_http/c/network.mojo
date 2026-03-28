@@ -1,11 +1,11 @@
-from ffi import c_char, c_int, c_uint, c_ushort, external_call, get_errno
-from sys.info import size_of
+from std.ffi import c_char, c_int, c_uint, c_ushort, external_call, get_errno
+from std.sys.info import size_of
 
 from lightbug_http.c.address import AddressFamily, AddressLength
 from lightbug_http.c.aliases import ExternalImmutUnsafePointer, ExternalMutUnsafePointer, c_void
 from lightbug_http.utils.error import CustomError
-from memory import stack_allocation
-from utils import StaticTuple, Variant
+from std.memory import stack_allocation
+from std.utils import StaticTuple, Variant
 
 
 @fieldwise_init

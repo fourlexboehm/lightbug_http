@@ -1,5 +1,5 @@
 from lightbug_http.header import HeaderKey
-from utils import Variant
+from std.utils import Variant
 
 
 @fieldwise_init
