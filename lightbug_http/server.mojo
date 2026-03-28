@@ -291,7 +291,7 @@ fn handle_connection[
             try:
                 bytes_read = conn.read(buffer)
             except read_err:
-                if read_err.isa[EOF]() or read_err.isa[SocketClosedError]():
+                if read_err.isa[EOF]():
                     provision.state = ConnectionState.closed()
                     break
                 # On keep-alive connections, treat timeout (EAGAIN) as clean close
@@ -331,11 +331,7 @@ fn handle_connection[
                         provision.last_parse_len,
                     )
                 except parse_err:
-                    if parse_err.isa[RequestParseError]():
-                        # TODO: Differentiate errors
-                        _send_error_response(conn, BadRequest())
-                    else:
-                        _send_error_response(conn, BadRequest())
+                    _send_error_response(conn, BadRequest())
                     provision.state = ConnectionState.closed()
                     break
 
@@ -380,7 +376,7 @@ fn handle_connection[
             try:
                 bytes_read = conn.read(buffer)
             except read_err:
-                if read_err.isa[EOF]() or read_err.isa[SocketClosedError]():
+                if read_err.isa[EOF]():
                     provision.state = ConnectionState.closed()
                     break
                 raise read_err^

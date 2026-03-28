@@ -303,7 +303,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Writable):
         if HeaderKey.DATE not in self.headers:
             self.headers[HeaderKey.DATE] = http_date_now()
 
-    fn __init__[T: AnyType](out self, var body: Json[T]):
+    fn __init__[T: Movable](out self, var body: Json[T]):
         """Serialize a typed value as JSON and return a 200 OK response.
 
         Parameters:

@@ -287,7 +287,7 @@ fn parse_headers[
                 break
             value_len -= 1
 
-        headers[num_headers].value = String(value[:value_len]) if value_len < len(value) else value
+        headers[num_headers].value = String(value[byte=:value_len]) if value_len < len(value) else value
         headers[num_headers].value_len = value_len
         num_headers += 1
 

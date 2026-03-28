@@ -692,7 +692,7 @@ fn parse_address[
         if host.find(":") != -1:
             raise ParseError(ParseTooManyColonsError())
 
-    port = parse_port(address[colon_index + 1 :])
+    port = parse_port(address[byte=colon_index + 1 :])
     if host == AddressConstants.LOCALHOST:
 
         comptime if network.is_ipv4():
