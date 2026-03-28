@@ -1,5 +1,5 @@
 from lightbug_http.uri import URI
-from testing import TestSuite, assert_equal, assert_false, assert_raises, assert_true
+from std.testing import TestSuite, assert_equal, assert_false, assert_raises, assert_true
 
 
 fn test_uri_no_parse_defaults() raises:

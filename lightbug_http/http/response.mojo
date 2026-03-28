@@ -46,17 +46,13 @@ comptime ResponseParseError = Variant[
 ]
 
 
-struct Json[T: Movable]:
-    """Wraps a value to be serialized as a JSON HTTP response body.
+struct Json:
+    """Pre-serialized JSON value for use as an HTTP response body."""
 
-    Parameters:
-        T: Any struct type to serialize as JSON.
-    """
+    var _serialized: String
 
-    var value: Self.T
-
-    fn __init__(out self, owned value: Self.T):
-        self.value = value^
+    fn __init__[T: AnyType](out self, value: T):
+        self._serialized = serialize(value)
 
 
 struct StatusCode:
@@ -303,17 +299,14 @@ struct HTTPResponse(Encodable, Movable, Sized, Writable):
         if HeaderKey.DATE not in self.headers:
             self.headers[HeaderKey.DATE] = http_date_now()
 
-    fn __init__[T: Movable](out self, var body: Json[T]):
+    fn __init__(out self, var body: Json):
         """Serialize a typed value as JSON and return a 200 OK response.
-
-        Parameters:
-            T: Any struct type to serialize as JSON.
 
         Args:
             body: The Json-wrapped value to serialize.
         """
         self = HTTPResponse(
-            body_bytes=serialize(body.value).as_bytes(),
+            body_bytes=body._serialized.as_bytes(),
             headers=Headers(Header(HeaderKey.CONTENT_TYPE, "application/json")),
         )
 

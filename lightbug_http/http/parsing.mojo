@@ -467,13 +467,13 @@ fn http_parse_response_headers[
 
         get_token_to_eol(buf, msg, msg_len)
 
-        if msg_len > 0 and msg[0:1] == " ":
+        if msg_len > 0 and msg[byte=0:1] == " ":
             var i = 0
-            while i < msg_len and msg[i : i + 1] == " ":
+            while i < msg_len and msg[byte=i : i + 1] == " ":
                 i += 1
-            msg = String(msg[i:])
+            msg = String(msg[byte=i:])
             msg_len -= i
-        elif msg_len > 0 and msg[0:1] != String(" "):
+        elif msg_len > 0 and msg[byte=0:1] != String(" "):
             return -1
 
         parse_headers(buf, headers, num_headers, max_headers)

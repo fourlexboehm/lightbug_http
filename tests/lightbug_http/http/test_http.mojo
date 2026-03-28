@@ -1,10 +1,10 @@
-from collections import Dict, List
+from std.collections import Dict, List
 
 import testing
 from lightbug_http.header import Header, HeaderKey, Headers
 from lightbug_http.io.bytes import Bytes
 from lightbug_http.uri import URI
-from testing import assert_equal, assert_false, assert_true
+from std.testing import assert_equal, assert_false, assert_true
 
 from lightbug_http.cookie import Cookie, Duration, RequestCookieJar, ResponseCookieJar, ResponseCookieKey
 from lightbug_http.http import HTTPRequest, HTTPResponse, encode
@@ -13,7 +13,7 @@ from lightbug_http.http import HTTPRequest, HTTPResponse, encode
 comptime default_server_conn_string = "http://localhost:8080"
 
 
-def test_encode_http_request():
+def test_encode_http_request() raises:
     var uri: URI
     try:
         uri = URI.parse(default_server_conn_string + "/foobar?baz")
@@ -51,7 +51,7 @@ def test_encode_http_request():
     testing.assert_equal(req_encoded, as_str)
 
 
-def test_encode_http_response():
+def test_encode_http_response() raises:
     var res = HTTPResponse("Hello, World!".as_bytes())
     res.headers[HeaderKey.DATE] = "2024-06-02T13:41:50.766880+00:00"
 
@@ -82,7 +82,7 @@ def test_encode_http_response():
     testing.assert_equal(res_encoded, as_str)
 
 
-def test_decoding_http_response():
+def test_decoding_http_response() raises:
     var res = String(
         "HTTP/1.1 200 OK\r\n"
         "server: lightbug_http\r\n"
@@ -123,7 +123,7 @@ def test_decoding_http_response():
 #     testing.assert_equal(v2._v, 2)
 
 
-def test_header_iso8859_encoding_regression():
+def test_header_iso8859_encoding_regression() raises:
     """Regression: header values must be ISO-8859-1 encoded on the wire, not raw UTF-8.
 
     Before the fix, a header value containing 'é' (U+00E9), which Mojo stores
@@ -151,7 +151,7 @@ def test_header_iso8859_encoding_regression():
     assert_false(utf8_lead_found)
 
 
-def test_request_header_iso8859_encoding_regression():
+def test_request_header_iso8859_encoding_regression() raises:
     """Regression: request header values must be ISO-8859-1 encoded on the wire, not raw UTF-8.
 
     Mirrors test_header_iso8859_encoding_regression but for HTTPRequest.encode(),
@@ -179,5 +179,5 @@ def test_request_header_iso8859_encoding_regression():
     assert_false(utf8_lead_found)
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

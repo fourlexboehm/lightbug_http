@@ -1,9 +1,9 @@
 from lightbug_http.header import Header, Headers, encode_latin1_header_value, write_header_latin1
 from lightbug_http.io.bytes import ByteReader, Bytes, ByteWriter
-from testing import TestSuite, assert_equal, assert_true
+from std.testing import TestSuite, assert_equal, assert_true
 
 
-def test_header_case_insensitive():
+def test_header_case_insensitive() raises:
     var headers = Headers(Header("Host", "SomeHost"))
     assert_true("host" in headers)
     assert_true("HOST" in headers)
@@ -43,7 +43,7 @@ def test_header_case_insensitive():
 #     assert_equal(header["Trailer"], "end-of-message")
 
 
-def test_encode_latin1_ascii():
+def test_encode_latin1_ascii() raises:
     """ASCII values are passed through unchanged."""
     var result = encode_latin1_header_value("hello, world")
     assert_equal(len(result), 12)
@@ -51,7 +51,7 @@ def test_encode_latin1_ascii():
     assert_equal(result[5], UInt8(0x2C))
 
 
-def test_encode_latin1_supplement():
+def test_encode_latin1_supplement() raises:
     """UTF-8 codepoints U+0080–U+00FF are transcoded to single ISO-8859-1 bytes."""
     # "é" = U+00E9, UTF-8: 0xC3 0xA9 → ISO-8859-1: 0xE9
     var result = encode_latin1_header_value("é")
@@ -69,7 +69,7 @@ def test_encode_latin1_supplement():
     assert_equal(result[3], UInt8(0xE9))
 
 
-def test_encode_latin1_obs_text():
+def test_encode_latin1_obs_text() raises:
     """Raw obs-text bytes (0x80–0xFF, not part of a valid UTF-8 sequence) pass through as-is."""
     # 0xA2 alone is not a valid UTF-8 lead byte → treated as obs-text
     var result = encode_latin1_header_value("c\xa2y")
@@ -79,7 +79,7 @@ def test_encode_latin1_obs_text():
     assert_equal(result[2], UInt8(0x79))
 
 
-def test_encode_latin1_above_latin1():
+def test_encode_latin1_above_latin1() raises:
     """Codepoints above U+00FF fall back to raw UTF-8 bytes (best-effort)."""
     # "€" = U+20AC, UTF-8: 0xE2 0x82 0xAC — codepoint > 0xFF → raw passthrough
     var result = encode_latin1_header_value("€")
@@ -89,7 +89,7 @@ def test_encode_latin1_above_latin1():
     assert_equal(result[2], UInt8(0xAC))
 
 
-def test_write_header_latin1_encodes_value():
+def test_write_header_latin1_encodes_value() raises:
     """Values with Latin-1 supplement characters are encoded as single bytes on the wire."""
     var writer = ByteWriter()
     write_header_latin1(writer, "x-test", "café")
@@ -101,7 +101,7 @@ def test_write_header_latin1_encodes_value():
     assert_equal(bytes[13], UInt8(0x0A))
 
 
-def test_headers_write_latin1_to():
+def test_headers_write_latin1_to() raises:
     """Headers.write_latin1_to transcodes values for HTTP wire format."""
     var headers = Headers(Header("x-lang", "café"))
     var writer = ByteWriter()
@@ -112,5 +112,5 @@ def test_headers_write_latin1_to():
     assert_equal(bytes[11], UInt8(0xE9))  # single Latin-1 byte for 'é'
 
 
-def main():
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

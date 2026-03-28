@@ -1,7 +1,7 @@
-from collections import Optional
+from std.collections import Optional
 
 from small_time.small_time import SmallTime, now
-from testing import TestSuite, assert_equal, assert_true
+from std.testing import TestSuite, assert_equal, assert_true
 
 from lightbug_http.cookie import Cookie, Duration, Expiration, SameSite
 
@@ -46,5 +46,5 @@ fn test_expires_http_timestamp_format() raises:
     assert_equal(expected, http_date.value())
 
 
-def main():
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

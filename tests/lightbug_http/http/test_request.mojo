@@ -10,7 +10,7 @@ comptime default_max_request_body_size = 4 * 1024 * 1024  # 4MB
 comptime default_max_request_uri_length = 8192
 
 
-def test_request_from_bytes():
+def test_request_from_bytes() raises:
     comptime data = "GET /redirect HTTP/1.1\r\nHost: 127.0.0.1:8080\r\nUser-Agent: python-requests/2.32.3\r\nAccept-Encoding: gzip, deflate, br, zstd\r\nAccept: */*\r\nconnection: keep-alive\r\n\r\n"
     var parsed = parse_request_headers(data.as_bytes())
     var request: HTTPRequest
@@ -38,7 +38,7 @@ def test_request_from_bytes():
     testing.assert_true(request.connection_close())
 
 
-def test_read_body():
+def test_read_body() raises:
     comptime data = "GET /redirect HTTP/1.1\r\nHost: 127.0.0.1:8080\r\nUser-Agent: python-requests/2.32.3\r\nAccept-Encoding: gzip, deflate, br, zstd\r\nAccept: */*\r\nContent-Length: 17\r\nconnection: keep-alive\r\n\r\nThis is the body!"
     # Parse headers first
     var data_span = data.as_bytes()
@@ -74,9 +74,9 @@ def test_read_body():
     )
 
 
-def test_encode():
+def test_encode() raises:
     ...
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

@@ -12,7 +12,7 @@ from lightbug_http.io.bytes import Bytes, ByteWriter
 #     testing.assert_equal(to_string(w^.consume()), to_string(Bytes(2)))
 
 
-def test_consuming_write():
+def test_consuming_write() raises:
     var w = ByteWriter()
     var my_string: String = "World"
     w.consuming_write(List[Byte]("Hello ".as_bytes()))
@@ -22,7 +22,7 @@ def test_consuming_write():
     testing.assert_equal(String(unsafe_from_utf8=result^), "Hello World")
 
 
-def test_write():
+def test_write() raises:
     var w = ByteWriter()
     w.write("Hello", ", ")
     w.write_string("World!".as_bytes())
@@ -44,5 +44,5 @@ def test_write():
     testing.assert_equal(String(unsafe_from_utf8=w^.consume()), String(unsafe_from_utf8=Span(result)))
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()
