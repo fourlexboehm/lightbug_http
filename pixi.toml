@@ -41,23 +41,23 @@ backend = { name = "pixi-build-mojo", version = "*" }
 
 [dependencies]
 mojo = ">=0.26.2.0,<0.26.3.0"
-small_time = {path = "../small-time"}
-emberjson = {path = "../EmberJson"}
+small_time = ">=26.2.0,<26.3"
+emberjson = ">=0.3.1,<0.4"
 
 [package.host-dependencies]
 mojo-compiler = ">=0.26.2.0,<0.26.3.0"
-small_time = {path = "../small-time"}
-emberjson = {path = "../EmberJson"}
+small_time = ">=26.2.0,<26.3"
+emberjson = ">=0.3.1,<0.4"
 
 [package.build-dependencies]
 mojo-compiler = ">=0.26.2.0,<0.26.3.0"
-small_time = {path = "../small-time"}
-emberjson = {path = "../EmberJson"}
+small_time = ">=26.2.0,<26.3"
+emberjson = ">=0.3.1,<0.4"
 
 [package.run-dependencies]
 mojo-compiler = ">=0.26.2.0,<0.26.3.0"
-small_time = {path = "../small-time"}
-emberjson = {path = "../EmberJson"}
+small_time = ">=26.2.0,<26.3"
+emberjson = ">=0.3.1,<0.4"
 
 [feature.util.dependencies]
 isort = ">=7.0.0,<8"
