@@ -1,5 +1,5 @@
-from emberjson import serialize
 from lightbug_http.connection import TCPConnection, default_buffer_size
+from lightbug_http.http.json import Json
 from lightbug_http.header import ParsedResponseHeaders, parse_response_headers
 from lightbug_http.http.chunked import HTTPChunkedDecoder
 from lightbug_http.http.date import http_date_now
@@ -44,15 +44,6 @@ comptime ResponseParseError = Variant[
     ResponseBodyReadError,
     ChunkedEncodingError,
 ]
-
-
-struct Json:
-    """Pre-serialized JSON value for use as an HTTP response body."""
-
-    var _serialized: String
-
-    fn __init__[T: AnyType](out self, value: T):
-        self._serialized = serialize(value)
 
 
 struct StatusCode:

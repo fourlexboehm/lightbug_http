@@ -4,7 +4,7 @@ from std.testing import assert_equal, assert_true
 from emberjson import parse, deserialize
 from lightbug_http.header import HeaderKey
 from lightbug_http.http import OK, HTTPResponse
-from lightbug_http.http.response import Json
+from lightbug_http.http.json import Json
 
 
 @fieldwise_init

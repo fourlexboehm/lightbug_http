@@ -2,12 +2,21 @@ from emberjson import (
     parse,
     deserialize,
     try_deserialize,
+    serialize,
     JSON,
     JsonSerializable,
     JsonDeserializable,
 )
 from lightbug_http.http.request import HTTPRequest
-from lightbug_http.http.response import Json
+
+
+struct Json:
+    """Pre-serialized JSON value for use as an HTTP response body."""
+
+    var _serialized: String
+
+    fn __init__[T: AnyType](out self, value: T):
+        self._serialized = serialize(value)
 
 
 fn json_decode(req: HTTPRequest) raises -> JSON:
