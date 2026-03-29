@@ -1,5 +1,5 @@
-from testing import TestSuite
+from std.testing import TestSuite
 
 
-def main():
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()
