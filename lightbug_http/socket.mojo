@@ -84,10 +84,11 @@ struct InvalidCloseErrorConversionError(Movable, Writable, TrivialRegisterPassab
 @fieldwise_init
 struct SocketRecvError(Movable, Writable):
     """Error variant for socket receive operations.
-    Can be RecvError from the syscall or EOF if connection closed cleanly.
+    Can be RecvError from the syscall, EOF if connection closed cleanly,
+    or SocketClosedError if the socket was already closed.
     """
 
-    comptime type = Variant[RecvError, EOF]
+    comptime type = Variant[RecvError, EOF, SocketClosedError]
     var value: Self.type
 
     @implicit
@@ -98,11 +99,17 @@ struct SocketRecvError(Movable, Writable):
     fn __init__(out self, value: EOF):
         self.value = value
 
+    @implicit
+    fn __init__(out self, value: SocketClosedError):
+        self.value = value
+
     fn write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[RecvError]():
             writer.write(self.value[RecvError])
         elif self.value.isa[EOF]():
             writer.write("EOF")
+        elif self.value.isa[SocketClosedError]():
+            writer.write("SocketClosedError")
 
     fn isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
@@ -658,7 +665,10 @@ struct Socket[
         Raises:
             RecvError: If reading data from the socket fails.
             EOF: If 0 bytes are received.
+            SocketClosedError: If the socket is already closed.
         """
+        if self._closed:
+            raise SocketClosedError()
         var bytes_received: UInt
         var size = len(buffer)
         bytes_received = recv(
