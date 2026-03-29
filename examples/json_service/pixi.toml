@@ -1,0 +1,13 @@
+[workspace]
+channels = ["https://conda.modular.com/max", "https://repo.prefix.dev/modular-community", "https://repo.prefix.dev/mojo-community", "conda-forge"]
+name = "json_service"
+platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
+version = "0.1.0"
+preview = ["pixi-build"]
+
+[tasks]
+server = "mojo run server.mojo"
+
+[dependencies]
+mojo = ">=0.26.1.0,<0.26.2.0"
+lightbug_http = ">=0.26.1.2,<0.26.2.0"

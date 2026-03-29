@@ -1,4 +1,9 @@
+from lightbug_http.http.json import Json
 from lightbug_http.io.bytes import Bytes
+
+
+fn OK(body: Json) -> HTTPResponse:
+    return HTTPResponse(body^)
 
 
 fn OK(body: String, content_type: String = "text/plain") -> HTTPResponse:
