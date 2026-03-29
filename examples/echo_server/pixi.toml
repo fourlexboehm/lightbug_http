@@ -11,7 +11,7 @@ server = "mojo run server.mojo"
 client = "mojo run client.mojo"
 
 [dependencies]
-mojo = ">=0.26.1.0,<0.26.2.0"
+mojo = ">=0.26.2.0,<0.26.3"
 curl_wrapper = { git = "https://github.com/thatstoasty/mojo-curl.git", branch = "main", subdirectory = "shim" }
 floki = ">=0.1.0,<0.2"
-lightbug_http = ">=0.26.1.2,<0.26.2.0"
+lightbug_http = ">=0.26.2.0,<0.26.3"

@@ -9,5 +9,5 @@ preview = ["pixi-build"]
 server = "mojo run server.mojo"
 
 [dependencies]
-mojo = ">=0.26.1.0,<0.26.2.0"
-lightbug_http = ">=0.26.1.2,<0.26.2.0"
+mojo = ">=2.0,<0.26.3"
+lightbug_http = ">=0.26.2.0,<0.26.3"
