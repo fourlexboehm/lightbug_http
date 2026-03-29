@@ -422,8 +422,8 @@ fn getsockopt(
     * Reference: https://man7.org/linux/man-pages/man3/getsockopt.3p.html .
     """
     var option_value = stack_allocation[1, c_void]()
-    var option_len: socklen_t = size_of[Int]()
-    var result = _getsockopt(socket.value, level, option_name, option_value, Pointer(to=option_len))
+    var option_len: socklen_t = socklen_t(size_of[Int]())
+    var result = _getsockopt(Int32(socket.value), level, option_name, option_value, Pointer(to=option_len))
     if result == -1:
         var errno = get_errno()
         if errno == errno.EBADF:
@@ -889,7 +889,7 @@ fn connect(socket: FileDescriptor, mut address: SocketAddress) raises ConnectErr
     #### Notes:
     * Reference: https://man7.org/linux/man-pages/man3/connect.3p.html .
     """
-    var result = _connect(socket.value, Pointer(to=address.as_sockaddr_in()), address.SIZE)
+    var result = _connect(Int32(socket.value), Pointer(to=address.as_sockaddr_in()), address.SIZE)
     if result == -1:
         var errno = get_errno()
         if errno == errno.EACCES:
@@ -1098,7 +1098,7 @@ fn recvfrom[
     """
     var address_buffer_size = address.SIZE
     var result = _recvfrom(
-        socket.value,
+        Int32(socket.value),
         buffer.unsafe_ptr().bitcast[c_void](),
         length,
         flags,
@@ -1340,7 +1340,7 @@ fn sendto[
 
     """
     var result = _sendto(
-        socket.value,
+        Int32(socket.value),
         message.unsafe_ptr().bitcast[c_void](),
         length,
         flags,

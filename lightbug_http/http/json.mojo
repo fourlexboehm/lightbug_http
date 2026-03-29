@@ -3,7 +3,7 @@ from emberjson import (
     deserialize,
     try_deserialize,
     serialize,
-    JSON,
+    Value,
     JsonSerializable,
     JsonDeserializable,
 )
@@ -19,7 +19,7 @@ struct Json:
         self._serialized = serialize(value)
 
 
-fn json_decode(req: HTTPRequest) raises -> JSON:
+fn json_decode(req: HTTPRequest) raises -> Value:
     """Parse the request body as untyped JSON.
 
     Args:

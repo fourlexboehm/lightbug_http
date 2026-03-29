@@ -246,7 +246,7 @@ struct HTTPRequest(Copyable, Encodable, Writable):
             and self.uri == other.uri
             and self.headers == other.headers
             and self.cookies == other.cookies
-            and self.body_raw.__str__() == other.body_raw.__str__()
+            and String(self.body_raw) == String(other.body_raw)
         )
 
     fn __isnot__(self, other: HTTPRequest) -> Bool:

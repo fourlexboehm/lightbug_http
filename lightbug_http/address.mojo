@@ -357,8 +357,7 @@ fn get_ip_address(
         The IP address.
     """
 
-    @parameter
-    if CompilationTarget.is_macos():
+    comptime if CompilationTarget.is_macos():
         var result: CAddrInfo[addrinfo_macos]
         var hints = addrinfo_macos(
             ai_flags=0,
