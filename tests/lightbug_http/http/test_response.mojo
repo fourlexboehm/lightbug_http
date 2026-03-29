@@ -3,7 +3,7 @@ import testing
 from lightbug_http.http import HTTPResponse, StatusCode
 
 
-def test_response_from_bytes():
+def test_response_from_bytes() raises:
     comptime data = "HTTP/1.1 200 OK\r\nServer: example.com\r\nUser-Agent: Mozilla/5.0\r\nContent-Type: text/html\r\nContent-Encoding: gzip\r\nContent-Length: 17\r\n\r\nThis is the body!"
     var response: HTTPResponse
     try:
@@ -33,7 +33,7 @@ def test_response_from_bytes():
     )
 
 
-def test_is_redirect():
+def test_is_redirect() raises:
     comptime data = "HTTP/1.1 200 OK\r\nServer: example.com\r\nUser-Agent: Mozilla/5.0\r\nContent-Type: text/html\r\nContent-Encoding: gzip\r\nContent-Length: 17\r\n\r\nThis is the body!"
     var response: HTTPResponse
     try:
@@ -57,17 +57,17 @@ def test_is_redirect():
     testing.assert_true(response.is_redirect())
 
 
-def test_read_body():
+def test_read_body() raises:
     ...
 
 
-def test_read_chunks():
+def test_read_chunks() raises:
     ...
 
 
-def test_encode():
+def test_encode() raises:
     ...
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

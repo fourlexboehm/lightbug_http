@@ -58,7 +58,7 @@ Once you have a Mojo project set up locally,
 
    ```toml
    [dependencies]
-   lightbug_http = ">=0.26.1.2,<0.26.2"
+   lightbug_http = ">=0.26.2.0,<0.26.3"
    ```
 
 3. Run `pixi install` at the root of your project, where `pixi.toml` is located
@@ -151,6 +151,33 @@ struct ExampleRouter(HTTPService):
 
 We plan to add more advanced routing functionality in a future library called `lightbug_api`, see [Roadmap](#roadmap) for more details.
 
+### JSON
+
+Use `json_decode[T]` to deserialize a request body into a typed struct, and `Json(value)` to return a JSON response:
+
+```mojo
+from lightbug_http import OK, HTTPRequest, HTTPResponse, HTTPService
+from lightbug_http.http.json import Json, json_decode
+
+@fieldwise_init
+struct GreetRequest(Movable, Defaultable):
+    var name: String
+    fn __init__(out self): self.name = ""
+
+@fieldwise_init
+struct GreetResponse(Movable, Defaultable):
+    var message: String
+    fn __init__(out self): self.message = ""
+
+@fieldwise_init
+struct JsonService(HTTPService):
+    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+        var body = json_decode[GreetRequest](req)
+        return OK(Json(GreetResponse(String("Hello, ", body.name, "!"))))
+```
+
+JSON support is powered by [emberjson](https://github.com/bgreni/EmberJson).
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -190,7 +217,7 @@ Check out the examples directory for more example services built with Lightbug, 
 
 We're working on support for the following (contributors welcome!):
 
- - [ ] [JSON support](https://github.com/saviorand/lightbug_http/issues/4)
+ - [x] [JSON support](https://github.com/saviorand/lightbug_http/issues/4)
  - [ ] Complete HTTP/1.x support compliant with RFC 9110/9112 specs (see issues)
  - [ ] [SSL/HTTPS support](https://github.com/saviorand/lightbug_http/issues/20)
  - [ ] [Multiple simultaneous connections](https://github.com/saviorand/lightbug_http/issues/5), [parallelization and performance optimizations](https://github.com/saviorand/lightbug_http/issues/6)

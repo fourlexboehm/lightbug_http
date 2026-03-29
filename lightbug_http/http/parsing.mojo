@@ -1,6 +1,6 @@
 from lightbug_http.io.bytes import ByteReader, Bytes, create_string_from_ptr
 from lightbug_http.strings import BytesConstant, is_printable_ascii, is_token_char
-from utils import Variant
+from std.utils import Variant
 
 
 struct HTTPHeader(Copyable):
@@ -17,8 +17,7 @@ struct HTTPHeader(Copyable):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct ParseError(Movable, Stringable, Writable):
+struct ParseError(Movable, Writable, TrivialRegisterPassable):
     """Invalid HTTP syntax error."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -29,8 +28,7 @@ struct ParseError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct IncompleteError(Movable, Stringable, Writable):
+struct IncompleteError(Movable, Writable, TrivialRegisterPassable):
     """Need more data to complete parsing."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -41,7 +39,7 @@ struct IncompleteError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct HTTPParseError(Movable, Stringable, Writable):
+struct HTTPParseError(Movable, Writable):
     """Error variant for HTTP parsing operations."""
 
     comptime type = Variant[ParseError, IncompleteError]
@@ -283,13 +281,13 @@ fn parse_headers[
         get_token_to_eol(buf, value, value_len)
 
         while value_len > 0:
-            var c = value[value_len - 1 : value_len]
+            var c = value[byte=value_len - 1 : value_len]
             ref c_byte = c.as_bytes()[0]
             if c_byte != BytesConstant.whitespace and c_byte != BytesConstant.TAB:
                 break
             value_len -= 1
 
-        headers[num_headers].value = String(value[:value_len]) if value_len < len(value) else value
+        headers[num_headers].value = String(value[byte=:value_len]) if value_len < len(value) else value
         headers[num_headers].value_len = value_len
         num_headers += 1
 
@@ -469,13 +467,13 @@ fn http_parse_response_headers[
 
         get_token_to_eol(buf, msg, msg_len)
 
-        if msg_len > 0 and msg[0:1] == " ":
+        if msg_len > 0 and msg[byte=0:1] == " ":
             var i = 0
-            while i < msg_len and msg[i : i + 1] == " ":
+            while i < msg_len and msg[byte=i : i + 1] == " ":
                 i += 1
-            msg = String(msg[i:])
+            msg = String(msg[byte=i:])
             msg_len -= i
-        elif msg_len > 0 and msg[0:1] != String(" "):
+        elif msg_len > 0 and msg[byte=0:1] != String(" "):
             return -1
 
         parse_headers(buf, headers, num_headers, max_headers)

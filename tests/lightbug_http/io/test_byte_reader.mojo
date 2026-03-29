@@ -5,7 +5,7 @@ from lightbug_http.io.bytes import ByteReader, Bytes, EndOfReaderError
 comptime example = "Hello, World!"
 
 
-def test_peek():
+def test_peek() raises:
     var r = ByteReader("H".as_bytes())
     var b: Byte
     try:
@@ -31,7 +31,7 @@ def test_peek():
     testing.assert_true(raised, "Expected EndOfReaderError")
 
 
-def test_read_until():
+def test_read_until() raises:
     var r = ByteReader(example.as_bytes())
     var result: List[Byte] = [72, 101, 108, 108, 111]
     testing.assert_equal(r.read_pos, 0)
@@ -41,7 +41,7 @@ def test_read_until():
     testing.assert_equal(r.read_pos, 5)
 
 
-def test_read_bytes():
+def test_read_bytes() raises:
     var r = ByteReader(example.as_bytes())
     var result: List[Byte] = [
         72,
@@ -78,7 +78,7 @@ def test_read_bytes():
     )
 
 
-def test_read_word():
+def test_read_word() raises:
     var r = ByteReader(example.as_bytes())
     var result: List[Byte] = [72, 101, 108, 108, 111, 44]
     testing.assert_equal(r.read_pos, 0)
@@ -88,7 +88,7 @@ def test_read_word():
     testing.assert_equal(r.read_pos, 6)
 
 
-def test_read_line():
+def test_read_line() raises:
     # No newline, go to end of line
     var r = ByteReader(example.as_bytes())
     var result: List[Byte] = [
@@ -127,7 +127,7 @@ def test_read_line():
     testing.assert_equal(r2.read_pos, 13)
 
 
-def test_skip_whitespace():
+def test_skip_whitespace() raises:
     var r = ByteReader(" Hola".as_bytes())
     var result: List[Byte] = [72, 111, 108, 97]
     r.skip_whitespace()
@@ -137,7 +137,7 @@ def test_skip_whitespace():
     )
 
 
-def test_skip_carriage_return():
+def test_skip_carriage_return() raises:
     var r = ByteReader("\r\nHola".as_bytes())
     var result: List[Byte] = [72, 111, 108, 97]
     r.skip_carriage_return()
@@ -151,7 +151,7 @@ def test_skip_carriage_return():
     testing.assert_equal(String(unsafe_from_utf8=bytes), String(unsafe_from_utf8=result))
 
 
-def test_consume():
+def test_consume() raises:
     var r = ByteReader(example.as_bytes())
     var result: List[Byte] = [
         72,
@@ -171,5 +171,5 @@ def test_consume():
     testing.assert_equal(String(unsafe_from_utf8=r^.consume()), String(unsafe_from_utf8=result))
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

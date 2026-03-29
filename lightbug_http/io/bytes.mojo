@@ -1,9 +1,9 @@
-from sys import size_of
+from std.sys import size_of
 
 from lightbug_http.connection import default_buffer_size
 from lightbug_http.strings import BytesConstant
-from memory import memcpy
-from memory.span import ContiguousSlice, _SpanIter
+from std.memory import memcpy
+from std.memory.span import ContiguousSlice, _SpanIter
 
 
 comptime Bytes = List[Byte]
@@ -11,7 +11,7 @@ comptime Bytes = List[Byte]
 
 @always_inline
 fn byte[s: StringSlice]() -> Byte:
-    __comptime_assert len(s) == 1, "StringSlice must be of length 1 to convert to Byte."
+    comptime assert len(s) == 1, "StringSlice must be of length 1 to convert to Byte."
     return s.as_bytes()[0]
 
 
@@ -32,7 +32,7 @@ struct ByteWriter(Writer):
         self._inner = Bytes(capacity=capacity)
 
     @always_inline
-    fn write_bytes(mut self, bytes: Span[Byte]) -> None:
+    fn write_string(mut self, bytes: Span[Byte, _]) -> None:
         """Writes the contents of `bytes` into the internal buffer.
 
         Args:
@@ -58,8 +58,7 @@ struct ByteWriter(Writer):
             args: The data to write.
         """
 
-        @parameter
-        for i in range(args.__len__()):
+        comptime for i in range(args.__len__()):
             args[i].write_to(self)
 
     @always_inline
@@ -70,7 +69,7 @@ struct ByteWriter(Writer):
         return self._inner^
 
 
-struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Stringable):
+struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writable):
     """Convenience wrapper around a Span of Bytes."""
 
     var _inner: Span[Byte, Self.origin]
@@ -91,7 +90,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return True
         return False
 
-    fn __contains__(self, b: Span[Byte]) -> Bool:
+    fn __contains__(self, b: Span[Byte, _]) -> Bool:
         if len(b) > len(self._inner):
             return False
 
@@ -111,8 +110,11 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
     fn __getitem__(self, slc: ContiguousSlice) -> Self:
         return Self(self._inner[slc])
 
+    fn write_to[W: Writer, //](self, mut writer: W):
+        writer.write(StringSlice(unsafe_from_utf8=self._inner))
+
     fn __str__(self) -> String:
-        return String(unsafe_from_utf8=self._inner)
+        return String.write(self)
 
     fn __eq__(self, other: Self) -> Bool:
         # both empty
@@ -126,7 +128,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return False
         return True
 
-    fn __eq__(self, other: Span[Byte]) -> Bool:
+    fn __eq__(self, other: Span[Byte, _]) -> Bool:
         # both empty
         if not self._inner and not other:
             return True
@@ -149,7 +151,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
                 return False
         return True
 
-    fn __ne__(self, other: Span[Byte]) -> Bool:
+    fn __ne__(self, other: Span[Byte, _]) -> Bool:
         return not self == other
 
     fn __iter__(self) -> _SpanIter[Byte, Self.origin]:
@@ -175,7 +177,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Strin
 
 
 @fieldwise_init
-struct OutOfBoundsError(Stringable, Writable):
+struct OutOfBoundsError(Writable):
     var message: String
 
     fn __init__(out self):
@@ -189,7 +191,7 @@ struct OutOfBoundsError(Stringable, Writable):
 
 
 @fieldwise_init
-struct EndOfReaderError(Stringable, Writable):
+struct EndOfReaderError(Writable):
     var message: String
 
     fn __init__(out self):
@@ -306,46 +308,6 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
     fn consume(var self, bytes_len: Int = -1) -> Bytes:
         return Bytes(self^._inner[self.read_pos : self.read_pos + len(self) + 1])
 
-
-fn memmove[
-    T: Copyable, dest_origin: MutOrigin, src_origin: MutOrigin
-](dest: UnsafePointer[T, dest_origin], src: UnsafePointer[T, src_origin], count: Int,):
-    """
-    Copies count elements from src to dest, handling overlapping memory regions safely.
-    """
-    if count <= 0:
-        return
-
-    if dest == src:
-        return
-
-    # Check if memory regions overlap
-    var dest_addr = Int(dest)
-    var src_addr = Int(src)
-    var element_size = size_of[T]()
-    var total_bytes = count * element_size
-
-    var dest_end = dest_addr + total_bytes
-    var src_end = src_addr + total_bytes
-
-    # Check for overlap: regions overlap if one starts before the other ends
-    var overlaps = (dest_addr < src_end) and (src_addr < dest_end)
-
-    if not overlaps:
-        # No overlap - use fast memcpy
-        memcpy(dest=dest, src=src, count=count)
-    elif dest_addr < src_addr:
-        # Destination is before source - copy forwards (left to right)
-        for i in range(count):
-            (dest + i).init_pointee_copy((src + i)[])
-    else:
-        # Destination is after source - copy backwards (right to left)
-        var i = count - 1
-        while i >= 0:
-            (dest + i).init_pointee_copy((src + i)[])
-            i -= 1
-
-
 fn create_string_from_ptr[origin: ImmutOrigin](ptr: UnsafePointer[UInt8, origin], length: Int) -> String:
     """Create a String from a pointer and length.
 
@@ -360,7 +322,7 @@ fn create_string_from_ptr[origin: ImmutOrigin](ptr: UnsafePointer[UInt8, origin]
     # for i in range(length):
     #     buf.append(ptr[i])
 
-    result.write_bytes(Span(ptr=ptr, length=length))
+    result.write_string(StringSlice(unsafe_from_utf8=Span(ptr=ptr, length=length)))
 
     return result^
 

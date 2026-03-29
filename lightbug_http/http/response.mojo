@@ -1,11 +1,12 @@
 from lightbug_http.connection import TCPConnection, default_buffer_size
+from lightbug_http.http.json import Json
 from lightbug_http.header import ParsedResponseHeaders, parse_response_headers
 from lightbug_http.http.chunked import HTTPChunkedDecoder
 from lightbug_http.http.date import http_date_now
 from lightbug_http.io.bytes import ByteReader, Bytes, ByteWriter, byte
 from lightbug_http.strings import CR, LF, http, lineBreak, strHttp11, whitespace
 from lightbug_http.uri import URI
-from utils import Variant
+from std.utils import Variant
 
 
 @fieldwise_init
@@ -123,7 +124,7 @@ struct StatusCode:
 
 
 @fieldwise_init
-struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
+struct HTTPResponse(Encodable, Movable, Sized, Writable):
     var headers: Headers
     var cookies: ResponseCookieJar
     var body_raw: Bytes
@@ -133,7 +134,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
     var protocol: String
 
     @staticmethod
-    fn from_bytes(b: Span[Byte]) raises ResponseParseError -> HTTPResponse:
+    fn from_bytes(b: Span[Byte, _]) raises ResponseParseError -> HTTPResponse:
         var cookies = ResponseCookieJar()
 
         var properties: ParsedResponseHeaders
@@ -167,7 +168,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
             raise ResponseParseError(ResponseBodyReadError(detail=String(body_err)))
 
     @staticmethod
-    fn from_bytes(b: Span[Byte], conn: TCPConnection) raises ResponseParseError -> HTTPResponse:
+    fn from_bytes(b: Span[Byte, _], conn: TCPConnection) raises ResponseParseError -> HTTPResponse:
         var cookies = ResponseCookieJar()
 
         var properties: ParsedResponseHeaders
@@ -267,7 +268,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
 
     fn __init__(
         out self,
-        body_bytes: Span[Byte],
+        body_bytes: Span[Byte, _],
         headers: Headers = Headers(),
         cookies: ResponseCookieJar = ResponseCookieJar(),
         status_code: Int = 200,
@@ -288,6 +289,17 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
             self.set_content_length(len(body_bytes))
         if HeaderKey.DATE not in self.headers:
             self.headers[HeaderKey.DATE] = http_date_now()
+
+    fn __init__(out self, var body: Json):
+        """Serialize a typed value as JSON and return a 200 OK response.
+
+        Args:
+            body: The Json-wrapped value to serialize.
+        """
+        self = HTTPResponse(
+            body_bytes=body._serialized.as_bytes(),
+            headers=Headers(Header(HeaderKey.CONTENT_TYPE, "application/json")),
+        )
 
     fn __init__(
         out self,
@@ -365,7 +377,7 @@ struct HTTPResponse(Encodable, Movable, Sized, Stringable, Writable):
         except e:
             raise Error(String(e))
 
-    fn read_chunks(mut self, chunks: Span[Byte]) raises:
+    fn read_chunks(mut self, chunks: Span[Byte, _]) raises:
         var reader = ByteReader(chunks)
         while True:
             var size = atol(String(reader.read_line()), 16)

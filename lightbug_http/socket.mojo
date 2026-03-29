@@ -1,5 +1,5 @@
-from sys.ffi import c_uint
-from sys.info import CompilationTarget
+from std.ffi import c_uint
+from std.sys.info import CompilationTarget
 
 from lightbug_http.address import (
     Addr,
@@ -59,24 +59,21 @@ from lightbug_http.c.socket_error import (
 from lightbug_http.c.socket_error import SocketError as CSocketError
 from lightbug_http.connection import default_buffer_size
 from lightbug_http.io.bytes import Bytes
-from utils import Variant
+from std.utils import Variant
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct SocketClosedError(Movable):
+struct SocketClosedError(Movable, TrivialRegisterPassable):
     pass
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct EOF(Movable):
+struct EOF(Movable, TrivialRegisterPassable):
     pass
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct InvalidCloseErrorConversionError(Movable, Stringable, Writable):
+struct InvalidCloseErrorConversionError(Movable, Writable, TrivialRegisterPassable):
     fn write_to[W: Writer, //](self, mut writer: W):
         writer.write("InvalidCloseErrorConversionError: Cannot convert EBADF to FatalCloseError")
 
@@ -85,12 +82,13 @@ struct InvalidCloseErrorConversionError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketRecvError(Movable, Stringable, Writable):
+struct SocketRecvError(Movable, Writable):
     """Error variant for socket receive operations.
-    Can be RecvError from the syscall or EOF if connection closed cleanly.
+    Can be RecvError from the syscall, EOF if connection closed cleanly,
+    or SocketClosedError if the socket was already closed.
     """
 
-    comptime type = Variant[RecvError, EOF]
+    comptime type = Variant[RecvError, EOF, SocketClosedError]
     var value: Self.type
 
     @implicit
@@ -101,11 +99,17 @@ struct SocketRecvError(Movable, Stringable, Writable):
     fn __init__(out self, value: EOF):
         self.value = value
 
+    @implicit
+    fn __init__(out self, value: SocketClosedError):
+        self.value = value
+
     fn write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[RecvError]():
             writer.write(self.value[RecvError])
         elif self.value.isa[EOF]():
             writer.write("EOF")
+        elif self.value.isa[SocketClosedError]():
+            writer.write("SocketClosedError")
 
     fn isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
@@ -118,7 +122,7 @@ struct SocketRecvError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketRecvfromError(Movable, Stringable, Writable):
+struct SocketRecvfromError(Movable, Writable):
     """Error variant for socket recvfrom operations.
     Can be RecvfromError from the syscall or EOF if connection closed cleanly.
     """
@@ -151,7 +155,7 @@ struct SocketRecvfromError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketAcceptError(Movable, Stringable, Writable):
+struct SocketAcceptError(Movable, Writable):
     """Error variant for socket accept operations.
     Can be AcceptError or GetpeernameError from the syscall, SocketClosedError, or InetNtopError from binary_ip_to_string.
     """
@@ -196,7 +200,7 @@ struct SocketAcceptError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketBindError(Movable, Stringable, Writable):
+struct SocketBindError(Movable, Writable):
     """Error variant for socket bind operations.
     Can be BindError from bind(), SocketGetsocknameError from get_sock_name(), or InetPtonError from inet_pton.
     """
@@ -235,7 +239,7 @@ struct SocketBindError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketConnectError(Movable, Stringable, Writable):
+struct SocketConnectError(Movable, Writable):
     """Error variant for socket connect operations.
     Can be ConnectError from the syscall or SocketAcceptError from get_peer_name.
     """
@@ -268,7 +272,7 @@ struct SocketConnectError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct SocketGetsocknameError(Movable, Stringable, Writable):
+struct SocketGetsocknameError(Movable, Writable):
     """Error variant for socket getsockname operations.
     Can be GetsocknameError from the syscall, SocketClosedError, or InetNtopError from binary_ip_to_string.
     """
@@ -307,7 +311,7 @@ struct SocketGetsocknameError(Movable, Stringable, Writable):
 
 
 @fieldwise_init
-struct FatalCloseError(Movable, Stringable, Writable):
+struct FatalCloseError(Movable, Writable):
     """Error type for Socket.close() that excludes EBADF.
 
     EBADF is excluded because it indicates the socket is already closed,
@@ -364,7 +368,7 @@ struct Socket[
     address: Addr,
     sock_type: SocketType = SocketType.SOCK_STREAM,
     address_family: AddressFamily = AddressFamily.AF_INET,
-](Movable, Representable, Stringable, Writable):
+](Movable, Writable):
     """Represents a network file descriptor. Wraps around a file descriptor and provides network functions.
 
     Parameters:
@@ -608,7 +612,7 @@ struct Socket[
         Raises:
             SetsockoptError: If setting the socket option fails.
         """
-        setsockopt(self.fd, SOL_SOCKET, option_name.value, option_value)
+        setsockopt(self.fd, SOL_SOCKET, option_name.value, Int32(option_value))
 
     fn connect(mut self, mut ip_address: String, port: UInt16) raises -> None:
         """Connect to a remote socket at address.
@@ -627,10 +631,10 @@ struct Socket[
         var remote = self.get_peer_name()
         self.remote_address = Self.address(remote[0], remote[1])
 
-    fn send(self, buffer: Span[Byte]) raises SendError -> UInt:
+    fn send(self, buffer: Span[Byte, _]) raises SendError -> UInt:
         return send(self.fd, buffer, UInt(len(buffer)), 0)
 
-    fn send_to(self, src: Span[Byte], mut host: String, port: UInt16) raises -> UInt:
+    fn send_to(self, src: Span[Byte, _], mut host: String, port: UInt16) raises -> UInt:
         """Send data to the a remote address by connecting to the remote socket before sending.
         The socket must be not already be connected to a remote socket.
 
@@ -661,7 +665,10 @@ struct Socket[
         Raises:
             RecvError: If reading data from the socket fails.
             EOF: If 0 bytes are received.
+            SocketClosedError: If the socket is already closed.
         """
+        if self._closed:
+            raise SocketClosedError()
         var bytes_received: UInt
         var size = len(buffer)
         bytes_received = recv(
@@ -821,9 +828,9 @@ struct Socket[
         """
         # SO_RCVTIMEO requires a timeval struct: {tv_sec: Int64, tv_usec: Int64}
         # (16 bytes on both macOS and Linux 64-bit).
-        var timeval = InlineArray[Int64, 2](seconds, 0)
+        var timeval: InlineArray[Int64, 2] = [Int64(seconds), 0]
         _ = _setsockopt(
-            self.fd.value,
+            Int32(self.fd.value),
             SOL_SOCKET,
             SocketOption.SO_RCVTIMEO.value,
             UnsafePointer(to=timeval).bitcast[c_void](),

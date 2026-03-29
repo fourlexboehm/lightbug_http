@@ -20,13 +20,13 @@ from lightbug_http.service import HTTPService
 from lightbug_http.socket import EOF, FatalCloseError, SocketAcceptError, SocketClosedError, SocketRecvError
 from lightbug_http.utils.error import CustomError
 from lightbug_http.utils.owning_list import OwningList
-from utils import Variant
+from std.utils import Variant
 
 from lightbug_http.http import HTTPRequest, HTTPResponse, encode
 
 
 @fieldwise_init
-struct ServerError(Movable, Stringable, Writable):
+struct ServerError(Movable, Writable):
     """Error variant for server operations."""
 
     comptime type = Variant[
@@ -192,8 +192,7 @@ struct ConnectionProvision(Movable):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct ProvisionPoolExhaustedError(CustomError):
+struct ProvisionPoolExhaustedError(CustomError, TrivialRegisterPassable):
     comptime message = "ProvisionError: Connection provision pool exhausted"
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -204,7 +203,7 @@ struct ProvisionPoolExhaustedError(CustomError):
 
 
 @fieldwise_init
-struct ProvisionError(Movable, Stringable, Writable):
+struct ProvisionError(Movable, Writable):
     """Error variant for provision pool operations."""
 
     comptime type = Variant[ProvisionPoolExhaustedError]
@@ -332,10 +331,7 @@ fn handle_connection[
                         provision.last_parse_len,
                     )
                 except parse_err:
-                    if parse_err.isa[RequestParseError]():
-                        # TODO: Differentiate errors
-                        _send_error_response(conn, BadRequest())
-                    else:
+                    if not parse_err.is_incomplete():
                         _send_error_response(conn, BadRequest())
                     provision.state = ConnectionState.closed()
                     break

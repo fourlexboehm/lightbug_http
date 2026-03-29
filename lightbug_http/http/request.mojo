@@ -3,7 +3,7 @@ from lightbug_http.io.bytes import Bytes, ByteWriter
 from lightbug_http.io.sync import Duration
 from lightbug_http.strings import lineBreak, strHttp11, whitespace
 from lightbug_http.uri import URI
-from utils import Variant
+from std.utils import Variant
 
 from lightbug_http.cookie import RequestCookieJar
 
@@ -69,7 +69,7 @@ comptime strSlash = "/"
 
 
 @fieldwise_init
-struct HTTPRequest(Copyable, Encodable, Stringable, Writable):
+struct HTTPRequest(Copyable, Encodable, Writable):
     """Represents a parsed HTTP request.
 
     This type is constructed from already-parsed components. The server is responsible
@@ -246,7 +246,7 @@ struct HTTPRequest(Copyable, Encodable, Stringable, Writable):
             and self.uri == other.uri
             and self.headers == other.headers
             and self.cookies == other.cookies
-            and self.body_raw.__str__() == other.body_raw.__str__()
+            and String(self.body_raw) == String(other.body_raw)
         )
 
     fn __isnot__(self, other: HTTPRequest) -> Bool:

@@ -1,5 +1,5 @@
 from lightbug_http.http.chunked import HTTPChunkedDecoder
-from testing import TestSuite, assert_equal, assert_false, assert_true
+from std.testing import TestSuite, assert_equal, assert_false, assert_true
 
 
 fn chunked_at_once_test(

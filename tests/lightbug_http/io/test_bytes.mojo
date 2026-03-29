@@ -86,5 +86,5 @@ fn test_string_to_bytes() raises:
         testing.assert_equal(c.key, String(unsafe_from_utf8=c.value))
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

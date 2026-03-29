@@ -1,5 +1,5 @@
 @fieldwise_init
-struct Duration(Copyable):
+struct Duration(Copyable, ImplicitlyCopyable):
     var total_seconds: Int
 
     fn __init__(

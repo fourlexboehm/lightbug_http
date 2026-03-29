@@ -2,7 +2,7 @@ import testing
 from lightbug_http.server import Server
 
 
-def test_server_defaults_to_keep_alive_off():
+def test_server_defaults_to_keep_alive_off() raises:
     var server = Server()
     testing.assert_false(
         server.tcp_keep_alive,
@@ -10,5 +10,5 @@ def test_server_defaults_to_keep_alive_off():
     )
 
 
-def main():
+def main() raises:
     testing.TestSuite.discover_tests[__functions_in_module()]().run()

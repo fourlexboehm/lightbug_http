@@ -1,5 +1,5 @@
-from sys.info import CompilationTarget
-from time import sleep
+from std.sys.info import CompilationTarget
+from std.time import sleep
 
 from lightbug_http.address import HostPort, NetworkType, ParseError, TCPAddr, UDPAddr, parse_address
 from lightbug_http.c.address import AddressFamily
@@ -31,7 +31,7 @@ from lightbug_http.socket import (
     UDPSocket,
 )
 from lightbug_http.utils.error import CustomError
-from utils import Variant
+from std.utils import Variant
 
 
 comptime default_buffer_size = 4096
@@ -41,8 +41,7 @@ comptime default_tcp_keep_alive = Duration(15 * 1000 * 1000 * 1000)  # 15 second
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct AddressParseError(CustomError):
+struct AddressParseError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to parse listen address"
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -53,8 +52,7 @@ struct AddressParseError(CustomError):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct SocketCreationError(CustomError):
+struct SocketCreationError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to create socket"
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -65,8 +63,7 @@ struct SocketCreationError(CustomError):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct BindFailedError(CustomError):
+struct BindFailedError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to bind socket to address"
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -77,8 +74,7 @@ struct BindFailedError(CustomError):
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct ListenFailedError(CustomError):
+struct ListenFailedError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to listen on socket"
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -89,7 +85,7 @@ struct ListenFailedError(CustomError):
 
 
 @fieldwise_init
-struct ListenerError(Movable, Stringable, Writable):
+struct ListenerError(Movable, Writable):
     """Error variant for listener creation operations.
 
     Represents failures during address parsing, socket creation, binding, or listening.
@@ -357,7 +353,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         return self.socket.receive(buf)
 
-    fn write(self, buf: Span[Byte]) raises SendError -> UInt:
+    fn write(self, buf: Span[Byte, _]) raises SendError -> UInt:
         """Write all data to the TCP connection, handling partial sends.
 
         Args:
@@ -465,7 +461,7 @@ struct UDPConnection[
 
         return self.socket.receive_from(dest)
 
-    fn write_to(mut self, src: Span[Byte], mut address: UDPAddr) raises SendtoError -> UInt:
+    fn write_to(mut self, src: Span[Byte, _], mut address: UDPAddr) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -481,7 +477,7 @@ struct UDPConnection[
 
         return self.socket.send_to(src, address.ip, address.port)
 
-    fn write_to(mut self, src: Span[Byte], mut host: String, port: UInt16) raises SendtoError -> UInt:
+    fn write_to(mut self, src: Span[Byte, _], mut host: String, port: UInt16) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -533,7 +529,7 @@ struct UDPConnection[
 
 
 @fieldwise_init
-struct CreateConnectionError(Movable, Stringable, Writable):
+struct CreateConnectionError(Movable, Writable):
     """Error variant for create_connection operations.
     Can be CSocketError from socket creation or SocketConnectError from connect.
     """

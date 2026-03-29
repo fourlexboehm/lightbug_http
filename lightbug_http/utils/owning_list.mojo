@@ -1,10 +1,10 @@
-from collections import Optional
-from collections._asan_annotations import __sanitizer_annotate_contiguous_container
-from os import abort
-from sys import size_of
-from sys.intrinsics import _type_is_eq
+from std.collections import Optional
+from std.collections._asan_annotations import __sanitizer_annotate_contiguous_container
+from std.os import abort
+from std.sys import size_of
+from std.sys.intrinsics import _type_is_eq
 
-from memory import Pointer, Span, memcpy
+from std.memory import Pointer, Span, memcpy
 
 
 # ===-----------------------------------------------------------------------===#
@@ -124,7 +124,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
     # Operator dunders
     # ===-------------------------------------------------------------------===#
 
-    fn __contains__[U: Equatable & Movable, //](self: OwningList[U, *_], value: U) -> Bool:
+    fn __contains__[U: Equatable & Movable, //](self: OwningList[U, ...], value: U) -> Bool:
         """Verify if a given value is present in the list.
 
         Parameters:
@@ -171,7 +171,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         return len(self) > 0
 
     @no_inline
-    fn __str__[U: Representable & Movable, //](self: OwningList[U, *_]) -> String:
+    fn __str__[U: Writable & Movable, //](self: OwningList[U, ...]) -> String:
         """Returns a string representation of a `List`.
 
         When the compiler supports conditional methods, then a simple `String(my_list)` will
@@ -181,7 +181,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
 
         Parameters:
             U: The type of the elements in the list. Must implement the
-              traits `Representable` and `Movable`.
+              traits `Writable` and `Movable`.
 
         Returns:
             A string representation of the list.
@@ -191,12 +191,12 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         return output^
 
     @no_inline
-    fn write_to[W: Writer, U: Representable & Movable, //](self: OwningList[U, *_], mut writer: W):
+    fn write_to[W: Writer, U: Writable & Movable, //](self: OwningList[U, ...], mut writer: W):
         """Write `my_list.__str__()` to a `Writer`.
 
         Parameters:
             W: A type conforming to the Writable trait.
-            U: The type of the List elements. Must have the trait `Representable & Movable`.
+            U: The type of the List elements. Must have the trait `Writable & Movable`.
 
         Args:
             writer: The object to write to.
@@ -209,7 +209,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
         writer.write("]")
 
     @no_inline
-    fn __repr__[U: Representable & Movable, //](self: OwningList[U, *_]) -> String:
+    fn __repr__[U: Writable & Movable, //](self: OwningList[U, ...]) -> String:
         """Returns a string representation of a `List`.
 
         Note that since we can't condition methods on a trait yet,
@@ -227,7 +227,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
 
         Parameters:
             U: The type of the elements in the list. Must implement the
-              traits `Representable` and `Movable`.
+              traits `Writable` and `Movable`.
 
         Returns:
             A string representation of the list.
@@ -250,8 +250,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
     fn _realloc(mut self, new_capacity: Int):
         var new_data = alloc[Self.T](new_capacity)
 
-        @parameter
-        if Self.T.__moveinit__is_trivial:
+        comptime if Self.T.__move_ctor_is_trivial:
             memcpy(dest=new_data, src=self.data, count=len(self))
         else:
             for i in range(len(self)):
@@ -304,7 +303,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
             earlier_idx -= 1
             later_idx -= 1
 
-    fn extend(mut self, var other: OwningList[Self.T, *_]):
+    fn extend(mut self, var other: OwningList[Self.T, ...]):
         """Extends this list by consuming the elements of `other`.
 
         Args:
@@ -405,7 +404,7 @@ struct OwningList[T: Movable & ImplicitlyDestructible](Boolable, Movable, Sized)
     # TODO: Remove explicit self type when issue 1876 is resolved.
     fn index[
         C: Equatable & Movable, //
-    ](ref self: OwningList[C, *_], value: C, start: Int = 0, stop: Optional[Int] = None,) raises -> Int:
+    ](ref self: OwningList[C, ...], value: C, start: Int = 0, stop: Optional[Int] = None,) raises -> Int:
         """
         Returns the index of the first occurrence of a value in a list
         restricted by the range given the start and stop bounds.

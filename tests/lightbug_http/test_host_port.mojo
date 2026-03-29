@@ -1,5 +1,5 @@
 from lightbug_http.address import HostPort, NetworkType, ParseError, TCPAddr, join_host_port, parse_address
-from testing import TestSuite, assert_equal, assert_false, assert_raises, assert_true
+from std.testing import TestSuite, assert_equal, assert_false, assert_raises, assert_true
 
 
 fn test_split_host_port_tcp4() raises:
@@ -167,7 +167,7 @@ fn test_split_host_port_error_missing_bracket() raises:
         _ = parse_address[NetworkType.tcp6]("[::1:8080")
 
 
-def test_join_host_port():
+def test_join_host_port() raises:
     # IPv4
     assert_equal(join_host_port("127.0.0.1", "8080"), "127.0.0.1:8080")
 

@@ -1,4 +1,4 @@
-from collections import Optional
+from std.collections import Optional
 
 from small_time.small_time import SmallTime, parse_time_with_format
 

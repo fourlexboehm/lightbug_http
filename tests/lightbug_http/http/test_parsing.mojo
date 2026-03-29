@@ -4,7 +4,7 @@ from lightbug_http.http.parsing import (
     http_parse_request_headers,
     http_parse_response_headers,
 )
-from testing import TestSuite, assert_equal, assert_false, assert_true
+from std.testing import TestSuite, assert_equal, assert_false, assert_true
 
 
 # Test helper structures

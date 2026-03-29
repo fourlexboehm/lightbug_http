@@ -1,16 +1,15 @@
-from collections import KeyElement
-from hashlib.hash import Hasher
+from std.collections import KeyElement
+from std.hashlib.hash import Hasher
 
 from lightbug_http.header import HeaderKey, write_header
 from lightbug_http.io.bytes import ByteWriter
-from utils import Variant
+from std.utils import Variant
 
 from lightbug_http.cookie.cookie import InvalidCookieError
 
 
 @fieldwise_init
-@register_passable("trivial")
-struct CookieParseError(Movable, Stringable, Writable):
+struct CookieParseError(Movable, Writable, TrivialRegisterPassable):
     """Error raised when a cookie header string fails to parse."""
 
     fn write_to[W: Writer, //](self, mut writer: W):
@@ -42,22 +41,22 @@ struct ResponseCookieKey(ImplicitlyCopyable, KeyElement):
     fn __eq__(self: Self, other: Self) -> Bool:
         return self.name == other.name and self.domain == other.domain and self.path == other.path
 
-    fn __moveinit__(out self: Self, deinit existing: Self):
-        self.name = existing.name
-        self.domain = existing.domain
-        self.path = existing.path
+    fn __moveinit__(out self: ResponseCookieKey, deinit take: ResponseCookieKey):
+        self.name = take.name
+        self.domain = take.domain
+        self.path = take.path
 
-    fn __copyinit__(out self: Self, existing: Self):
-        self.name = existing.name
-        self.domain = existing.domain
-        self.path = existing.path
+    fn __copyinit__(out self: ResponseCookieKey, copy: ResponseCookieKey):
+        self.name = copy.name
+        self.domain = copy.domain
+        self.path = copy.path
 
     fn __hash__[H: Hasher](self: Self, mut hasher: H):
         hasher.update(self.name + "~" + self.domain + "~" + self.path)
 
 
 @fieldwise_init
-struct ResponseCookieJar(Copyable, Sized, Stringable, Writable):
+struct ResponseCookieJar(Copyable, Sized, Writable):
     var _inner: Dict[ResponseCookieKey, Cookie]
 
     fn __init__(out self):
