@@ -1,5 +1,14 @@
 <a name="readme-top"></a>
 
+> [!WARNING]
+> **This repository is archived as of 2026-05-12 and is no longer maintained.**
+>
+> Check out these Mojo libraries instead:
+> - HTTP Client - [@thatstoasty/floki](https://github.com/thatstoasty/floki)
+> - JSON - [@bgreni/EmberJson](https://github.com/bgreni/EmberJson)
+> - CLI and Terminal - [@thatstoasty/prism](https://github.com/thatstoasty/prism), [@thatstoasty/mog](https://github.com/thatstoasty/mog)
+> - Date/Time - [@mojoto/morrow](https://github.com/mojoto/morrow.mojo) and [@thatstoasty/small_time](https://github.com/thatstoasty/small_time)
+
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -31,14 +40,6 @@ This is not production ready yet. We're aiming to keep up with new developments 
 Lightbug currently has the following features:
  - [x] Pure Mojo HTTP 1.1 server with no Python dependencies. Everything is fully typed, with no `def` functions used
  - [x] Cookie support
-
-### Check Out These Mojo Libraries:
-
-- HTTP Client - [@thatstoasty/floki](https://github.com/thatstoasty/floki)
-- CLI and Terminal - [@thatstoasty/prism](https://github.com/thatstoasty/prism), [@thatstoasty/mog](https://github.com/thatstoasty/mog)
-- Date/Time - [@mojoto/morrow](https://github.com/mojoto/morrow.mojo) and [@thatstoasty/small_time](https://github.com/thatstoasty/small_time)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
