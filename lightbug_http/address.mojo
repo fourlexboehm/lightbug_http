@@ -41,31 +41,31 @@ trait Addr(
 ):
     comptime _type: StaticString
 
-    fn __init__(out self, ip: String, port: UInt16):
+    def __init__(out self, ip: String, port: UInt16):
         ...
 
     @always_inline
-    fn address_family(self) -> Int:
+    def address_family(self) -> Int:
         ...
 
     @always_inline
-    fn is_v4(self) -> Bool:
+    def is_v4(self) -> Bool:
         ...
 
     @always_inline
-    fn is_v6(self) -> Bool:
+    def is_v6(self) -> Bool:
         ...
 
     @always_inline
-    fn is_unix(self) -> Bool:
+    def is_unix(self) -> Bool:
         ...
 
 
 trait AnAddrInfo(Copyable):
-    fn has_next(self) -> Bool:
+    def has_next(self) -> Bool:
         ...
 
-    fn next(self) -> ExternalMutUnsafePointer[Self]:
+    def next(self) -> ExternalMutUnsafePointer[Self]:
         ...
 
 
@@ -112,18 +112,18 @@ struct NetworkType(Equatable, ImplicitlyCopyable):
         Self.ip6,
     ]
 
-    fn __eq__(self, other: NetworkType) -> Bool:
+    def __eq__(self, other: NetworkType) -> Bool:
         return self.value == other.value
 
-    fn is_ip_protocol(self) -> Bool:
+    def is_ip_protocol(self) -> Bool:
         """Check if the network type is an IP protocol."""
         return self in (NetworkType.ip, NetworkType.ip4, NetworkType.ip6)
 
-    fn is_ipv4(self) -> Bool:
+    def is_ipv4(self) -> Bool:
         """Check if the network type is IPv4."""
         return self in (NetworkType.tcp4, NetworkType.udp4, NetworkType.ip4)
 
-    fn is_ipv6(self) -> Bool:
+    def is_ipv6(self) -> Bool:
         """Check if the network type is IPv6."""
         return self in (NetworkType.tcp6, NetworkType.udp6, NetworkType.ip6)
 
@@ -135,23 +135,23 @@ struct TCPAddr[network: NetworkType = NetworkType.tcp4](Addr, ImplicitlyCopyable
     var port: UInt16
     var zone: String  # IPv6 addressing zone
 
-    fn __init__(out self):
+    def __init__(out self):
         self.ip = "127.0.0.1"
         self.port = 8000
         self.zone = ""
 
-    fn __init__(out self, ip: String = "127.0.0.1", port: UInt16 = 8000):
+    def __init__(out self, ip: String = "127.0.0.1", port: UInt16 = 8000):
         self.ip = ip
         self.port = port
         self.zone = ""
 
-    fn __init__(out self, ip: String, port: UInt16, zone: String):
+    def __init__(out self, ip: String, port: UInt16, zone: String):
         self.ip = ip
         self.port = port
         self.zone = zone
 
     @always_inline
-    fn address_family(self) -> Int:
+    def address_family(self) -> Int:
         if Self.network == NetworkType.tcp4:
             return Int(AddressFamily.AF_INET.value)
         elif Self.network == NetworkType.tcp6:
@@ -160,32 +160,32 @@ struct TCPAddr[network: NetworkType = NetworkType.tcp4](Addr, ImplicitlyCopyable
             return Int(AddressFamily.AF_UNSPEC.value)
 
     @always_inline
-    fn is_v4(self) -> Bool:
+    def is_v4(self) -> Bool:
         return Self.network == NetworkType.tcp4
 
     @always_inline
-    fn is_v6(self) -> Bool:
+    def is_v6(self) -> Bool:
         return Self.network == NetworkType.tcp6
 
     @always_inline
-    fn is_unix(self) -> Bool:
+    def is_unix(self) -> Bool:
         return False
 
-    fn __eq__(self, other: Self) -> Bool:
+    def __eq__(self, other: Self) -> Bool:
         return self.ip == other.ip and self.port == other.port and self.zone == other.zone
 
-    fn __ne__(self, other: Self) -> Bool:
+    def __ne__(self, other: Self) -> Bool:
         return not self == other
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         if self.zone != "":
             return join_host_port(self.ip + "%" + self.zone, String(self.port))
         return join_host_port(self.ip, String(self.port))
 
-    fn __repr__(self) -> String:
+    def __repr__(self) -> String:
         return String.write(self)
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(
             "TCPAddr(",
             "ip=",
@@ -205,18 +205,18 @@ struct UDPAddr[network: NetworkType = NetworkType.udp4](Addr, ImplicitlyCopyable
     var port: UInt16
     var zone: String  # IPv6 addressing zone
 
-    fn __init__(out self):
+    def __init__(out self):
         self.ip = "127.0.0.1"
         self.port = 8000
         self.zone = ""
 
-    fn __init__(out self, ip: String = "127.0.0.1", port: UInt16 = 8000):
+    def __init__(out self, ip: String = "127.0.0.1", port: UInt16 = 8000):
         self.ip = ip
         self.port = port
         self.zone = ""
 
     @always_inline
-    fn address_family(self) -> Int:
+    def address_family(self) -> Int:
         if Self.network == NetworkType.udp4:
             return Int(AddressFamily.AF_INET.value)
         elif Self.network == NetworkType.udp6:
@@ -225,32 +225,32 @@ struct UDPAddr[network: NetworkType = NetworkType.udp4](Addr, ImplicitlyCopyable
             return Int(AddressFamily.AF_UNSPEC.value)
 
     @always_inline
-    fn is_v4(self) -> Bool:
+    def is_v4(self) -> Bool:
         return Self.network == NetworkType.udp4
 
     @always_inline
-    fn is_v6(self) -> Bool:
+    def is_v6(self) -> Bool:
         return Self.network == NetworkType.udp6
 
     @always_inline
-    fn is_unix(self) -> Bool:
+    def is_unix(self) -> Bool:
         return False
 
-    fn __eq__(self, other: Self) -> Bool:
+    def __eq__(self, other: Self) -> Bool:
         return self.ip == other.ip and self.port == other.port and self.zone == other.zone
 
-    fn __ne__(self, other: Self) -> Bool:
+    def __ne__(self, other: Self) -> Bool:
         return not self == other
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         if self.zone != "":
             return join_host_port(self.ip + "%" + self.zone, String(self.port))
         return join_host_port(self.ip, String(self.port))
 
-    fn __repr__(self) -> String:
+    def __repr__(self) -> String:
         return String.write(self)
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(
             "UDPAddr(",
             "ip=",
@@ -279,7 +279,7 @@ struct addrinfo_macos(AnAddrInfo, TrivialRegisterPassable):
     var ai_addr: ExternalMutUnsafePointer[sockaddr]
     var ai_next: ExternalMutUnsafePointer[addrinfo_macos]
 
-    fn __init__(
+    def __init__(
         out self,
         ai_flags: c_int = 0,
         ai_family: AddressFamily = AddressFamily.AF_UNSPEC,
@@ -296,10 +296,10 @@ struct addrinfo_macos(AnAddrInfo, TrivialRegisterPassable):
         self.ai_addr = {}
         self.ai_next = {}
 
-    fn has_next(self) -> Bool:
-        return Bool(self.ai_next)
+    def has_next(self) -> Bool:
+        return rebind[UInt](self.ai_next) != 0
 
-    fn next(self) -> ExternalMutUnsafePointer[Self]:
+    def next(self) -> ExternalMutUnsafePointer[Self]:
         return self.ai_next
 
 
@@ -318,7 +318,7 @@ struct addrinfo_unix(AnAddrInfo, TrivialRegisterPassable):
     var ai_canonname: ExternalMutUnsafePointer[c_char]
     var ai_next: ExternalMutUnsafePointer[addrinfo_unix]
 
-    fn __init__(
+    def __init__(
         out self,
         ai_flags: c_int = 0,
         ai_family: AddressFamily = AddressFamily.AF_UNSPEC,
@@ -335,14 +335,14 @@ struct addrinfo_unix(AnAddrInfo, TrivialRegisterPassable):
         self.ai_canonname = {}
         self.ai_next = {}
 
-    fn has_next(self) -> Bool:
-        return Bool(self.ai_addr)
+    def has_next(self) -> Bool:
+        return rebind[UInt](self.ai_addr) != 0
 
-    fn next(self) -> ExternalMutUnsafePointer[Self]:
+    def next(self) -> ExternalMutUnsafePointer[Self]:
         return self.ai_next
 
 
-fn get_ip_address(
+def get_ip_address(
     mut host: String, address_family: AddressFamily, sock_type: SocketType
 ) raises GetIPAddressError -> in_addr_t:
     """Returns an IP address based on the host.
@@ -406,17 +406,17 @@ fn get_ip_address(
         )
 
 
-fn is_ip_protocol(network: NetworkType) -> Bool:
+def is_ip_protocol(network: NetworkType) -> Bool:
     """Check if the network type is an IP protocol."""
     return network in (NetworkType.ip, NetworkType.ip4, NetworkType.ip6)
 
 
-fn is_ipv4(network: NetworkType) -> Bool:
+def is_ipv4(network: NetworkType) -> Bool:
     """Check if the network type is IPv4."""
     return network in (NetworkType.tcp4, NetworkType.udp4, NetworkType.ip4)
 
 
-fn is_ipv6(network: NetworkType) -> Bool:
+def is_ipv6(network: NetworkType) -> Bool:
     """Check if the network type is IPv6."""
     return network in (NetworkType.tcp6, NetworkType.udp6, NetworkType.ip6)
 
@@ -425,10 +425,10 @@ fn is_ipv6(network: NetworkType) -> Bool:
 struct ParseEmptyAddressError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse address: received empty address string."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -436,10 +436,10 @@ struct ParseEmptyAddressError(CustomError, TrivialRegisterPassable):
 struct ParseMissingClosingBracketError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse ipv6 address: missing ']'"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -447,10 +447,10 @@ struct ParseMissingClosingBracketError(CustomError, TrivialRegisterPassable):
 struct ParseMissingPortError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse ipv6 address: missing port in address"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -458,10 +458,10 @@ struct ParseMissingPortError(CustomError, TrivialRegisterPassable):
 struct ParseUnexpectedBracketError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Address failed bracket validation, unexpectedly contained brackets"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -469,10 +469,10 @@ struct ParseUnexpectedBracketError(CustomError, TrivialRegisterPassable):
 struct ParseEmptyPortError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse port: port string is empty."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -480,10 +480,10 @@ struct ParseEmptyPortError(CustomError, TrivialRegisterPassable):
 struct ParseInvalidPortNumberError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse port: invalid integer value."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -491,10 +491,10 @@ struct ParseInvalidPortNumberError(CustomError, TrivialRegisterPassable):
 struct ParsePortOutOfRangeError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse port: Port number out of range (0-65535)."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -502,10 +502,10 @@ struct ParsePortOutOfRangeError(CustomError, TrivialRegisterPassable):
 struct ParseMissingSeparatorError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse address: missing port separator ':' in address."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -513,10 +513,10 @@ struct ParseMissingSeparatorError(CustomError, TrivialRegisterPassable):
 struct ParseTooManyColonsError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: Failed to parse address: too many colons in address"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -524,10 +524,10 @@ struct ParseTooManyColonsError(CustomError, TrivialRegisterPassable):
 struct ParseIPProtocolPortError(CustomError, TrivialRegisterPassable):
     comptime message = "ParseError: IP protocol addresses should not include ports"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -535,10 +535,10 @@ struct ParseIPProtocolPortError(CustomError, TrivialRegisterPassable):
 struct GetaddrinfoNullAddrError(CustomError, TrivialRegisterPassable):
     comptime message = "GetaddrinfoError: Failed to get IP address because the response's `ai_addr` was null."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -546,10 +546,10 @@ struct GetaddrinfoNullAddrError(CustomError, TrivialRegisterPassable):
 struct GetaddrinfoError(CustomError, TrivialRegisterPassable):
     comptime message = "GetaddrinfoError: Failed to resolve address information."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -571,7 +571,7 @@ comptime ParseError = Variant[
 ]
 
 
-fn parse_ipv6_bracketed_address[
+def parse_ipv6_bracketed_address[
     origin: ImmutOrigin
 ](address: StringSlice[origin]) raises ParseError -> Tuple[StringSlice[origin], UInt16]:
     """Parse an IPv6 address enclosed in brackets.
@@ -596,7 +596,7 @@ fn parse_ipv6_bracketed_address[
     return address[byte=1:end_bracket_index], UInt16(end_bracket_index + 1)
 
 
-fn validate_no_brackets[
+def validate_no_brackets[
     origin: ImmutOrigin
 ](address: StringSlice[origin], start_idx: UInt16, end_idx: Optional[UInt16] = None,) raises ParseError:
     """Validate that the address segment contains no brackets."""
@@ -613,7 +613,7 @@ fn validate_no_brackets[
         raise ParseError(ParseUnexpectedBracketError())
 
 
-fn parse_port[origin: ImmutOrigin](port_str: StringSlice[origin]) raises ParseError -> UInt16:
+def parse_port[origin: ImmutOrigin](port_str: StringSlice[origin]) raises ParseError -> UInt16:
     """Parse and validate port number."""
     if port_str == AddressConstants.EMPTY:
         raise ParseError(ParseEmptyPortError())
@@ -636,7 +636,7 @@ struct HostPort(Movable):
     var port: UInt16
 
 
-fn parse_address[
+def parse_address[
     origin: ImmutOrigin,
     //,
     network: NetworkType,
@@ -703,13 +703,13 @@ fn parse_address[
 
 
 # TODO: Support IPv6 long form.
-fn join_host_port(host: String, port: String) -> String:
+def join_host_port(host: String, port: String) -> String:
     if host.find(":") != -1:  # must be IPv6 literal
         return String("[", host, "]:", port)
     return String(host, ":", port)
 
 
-fn binary_port_to_int(port: UInt16) -> Int:
+def binary_port_to_int(port: UInt16) -> Int:
     """Convert a binary port to an integer.
 
     Args:
@@ -721,7 +721,7 @@ fn binary_port_to_int(port: UInt16) -> Int:
     return Int(ntohs(port))
 
 
-fn binary_ip_to_string[address_family: AddressFamily](ip_address: UInt32) raises InetNtopError -> String:
+def binary_ip_to_string[address_family: AddressFamily](ip_address: UInt32) raises InetNtopError -> String:
     """Convert a binary IP address to a string by calling `inet_ntop`.
 
     Parameters:
@@ -740,7 +740,7 @@ fn binary_ip_to_string[address_family: AddressFamily](ip_address: UInt32) raises
         return inet_ntop[address_family, AddressLength.INET6_ADDRSTRLEN](ip_address)
 
 
-fn freeaddrinfo[T: AnAddrInfo, //](ptr: ExternalMutUnsafePointer[T]):
+def freeaddrinfo[T: AnAddrInfo, //](ptr: ExternalMutUnsafePointer[T]):
     """Free the memory allocated by `getaddrinfo`."""
     external_call["freeaddrinfo", NoneType, type_of(ptr)](ptr)
 
@@ -768,10 +768,10 @@ struct _CAddrInfoIterator[
     var src: Pointer[CAddrInfo[Self.T], Self.origin]
 
     @always_inline
-    fn __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
+    def __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
         return self.copy()
 
-    fn __has_next__(self) -> Bool:
+    def __has_next__(self) -> Bool:
         """Checks if there are more elements in the iterator.
 
         Returns:
@@ -782,7 +782,7 @@ struct _CAddrInfoIterator[
 
         return self.src[].ptr[].has_next()
 
-    fn __next__(mut self) -> Self.Element:
+    def __next__(mut self) -> Self.Element:
         """Returns the next element from the iterator.
 
         Returns:
@@ -811,7 +811,7 @@ struct CAddrInfo[T: AnAddrInfo](Iterable):
     ]: Iterator = _CAddrInfoIterator[Self.T, iterable_origin]
     var ptr: ExternalMutUnsafePointer[Self.T]
 
-    fn unsafe_ptr[
+    def unsafe_ptr[
         origin: Origin, address_space: AddressSpace, //
     ](ref [origin, address_space]self) -> UnsafePointer[Self.T, origin, address_space=address_space]:
         """Retrieves a pointer to the underlying memory.
@@ -825,11 +825,11 @@ struct CAddrInfo[T: AnAddrInfo](Iterable):
         """
         return self.ptr.unsafe_mut_cast[origin.mut]().unsafe_origin_cast[origin]().address_space_cast[address_space]()
 
-    fn __del__(deinit self):
+    def __del__(deinit self):
         if self.ptr:
             freeaddrinfo(self.ptr)
 
-    fn __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
+    def __iter__(ref self) -> Self.IteratorType[origin_of(self)]:
         """Iterate over elements of the list, returning immutable references.
 
         Returns:
@@ -838,7 +838,7 @@ struct CAddrInfo[T: AnAddrInfo](Iterable):
         return {0, Pointer(to=self)}
 
 
-fn gai_strerror(ecode: c_int) -> ExternalImmutUnsafePointer[c_char]:
+def gai_strerror(ecode: c_int) -> ExternalImmutUnsafePointer[c_char]:
     """Libc POSIX `gai_strerror` function.
 
     Args:
@@ -858,7 +858,7 @@ fn gai_strerror(ecode: c_int) -> ExternalImmutUnsafePointer[c_char]:
     return external_call["gai_strerror", ExternalImmutUnsafePointer[c_char], type_of(ecode)](ecode)
 
 
-fn _getaddrinfo[
+def _getaddrinfo[
     T: AnAddrInfo,
     node_origin: ImmutOrigin,
     serv_origin: ImmutOrigin,
@@ -900,7 +900,7 @@ fn _getaddrinfo[
     ](nodename, servname, hints, res)
 
 
-fn getaddrinfo[
+def getaddrinfo[
     T: AnAddrInfo, //
 ](mut node: String, mut service: String, hints: T) raises GetaddrinfoError -> CAddrInfo[T]:
     """Libc POSIX `getaddrinfo` function.

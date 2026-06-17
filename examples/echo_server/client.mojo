@@ -1,7 +1,7 @@
 import floki
 
 
-fn main() raises:
+def main() raises:
     var response = floki.post(
         "localhost:8080",
         headers={"Content-Type": "text/plain"},

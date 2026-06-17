@@ -44,10 +44,10 @@ comptime default_tcp_keep_alive = Duration(15 * 1000 * 1000 * 1000)  # 15 second
 struct AddressParseError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to parse listen address"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -55,10 +55,10 @@ struct AddressParseError(CustomError, TrivialRegisterPassable):
 struct SocketCreationError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to create socket"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -66,10 +66,10 @@ struct SocketCreationError(CustomError, TrivialRegisterPassable):
 struct BindFailedError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to bind socket to address"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -77,10 +77,10 @@ struct BindFailedError(CustomError, TrivialRegisterPassable):
 struct ListenFailedError(CustomError, TrivialRegisterPassable):
     comptime message = "ListenerError: Failed to listen on socket"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -97,34 +97,34 @@ struct ListenerError(Movable, Writable):
     var value: Self.type
 
     @implicit
-    fn __init__(out self, value: AddressParseError):
+    def __init__(out self, value: AddressParseError):
         self.value = value
 
     @implicit
-    fn __init__(out self, value: SocketCreationError):
+    def __init__(out self, value: SocketCreationError):
         self.value = value
 
     @implicit
-    fn __init__(out self, value: BindFailedError):
+    def __init__(out self, value: BindFailedError):
         self.value = value
 
     @implicit
-    fn __init__(out self, value: ListenFailedError):
+    def __init__(out self, value: ListenFailedError):
         self.value = value
 
     @implicit
-    fn __init__(out self, var value: CSocketError):
+    def __init__(out self, var value: CSocketError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: SocketBindError):
+    def __init__(out self, var value: SocketBindError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: Error):
+    def __init__(out self, var value: Error):
         self.value = value^
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[AddressParseError]():
             writer.write(self.value[AddressParseError])
         elif self.value.isa[SocketCreationError]():
@@ -140,13 +140,13 @@ struct ListenerError(Movable, Writable):
         elif self.value.isa[Error]():
             writer.write(self.value[Error])
 
-    fn isa[T: AnyType](self) -> Bool:
+    def isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
 
-    fn __getitem__[T: AnyType](self) -> ref [self.value] T:
+    def __getitem__[T: AnyType](self) -> ref [self.value] T:
         return self.value[T]
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -155,13 +155,13 @@ struct NoTLSListener[network: NetworkType = NetworkType.tcp4](Movable):
 
     var socket: TCPSocket[TCPAddr[Self.network]]
 
-    fn __init__(out self, var socket: TCPSocket[TCPAddr[Self.network]]):
+    def __init__(out self, var socket: TCPSocket[TCPAddr[Self.network]]):
         self.socket = socket^
 
-    fn __init__(out self) raises CSocketError:
+    def __init__(out self) raises CSocketError:
         self.socket = Socket[TCPAddr[Self.network]]()
 
-    fn accept(self) raises SocketAcceptError -> TCPConnection[Self.network]:
+    def accept(self) raises SocketAcceptError -> TCPConnection[Self.network]:
         """Accept an incoming TCP connection.
 
         Returns:
@@ -172,7 +172,7 @@ struct NoTLSListener[network: NetworkType = NetworkType.tcp4](Movable):
         """
         return TCPConnection(self.socket.accept())
 
-    fn close(mut self) raises FatalCloseError -> None:
+    def close(mut self) raises FatalCloseError -> None:
         """Close the listener socket.
 
         Raises:
@@ -180,7 +180,7 @@ struct NoTLSListener[network: NetworkType = NetworkType.tcp4](Movable):
         """
         return self.socket.close()
 
-    fn shutdown(mut self) raises ShutdownEINVALError:
+    def shutdown(mut self) raises ShutdownEINVALError:
         """Shutdown the listener socket.
 
         Raises:
@@ -188,7 +188,7 @@ struct NoTLSListener[network: NetworkType = NetworkType.tcp4](Movable):
         """
         return self.socket.shutdown()
 
-    fn teardown(deinit self) raises FatalCloseError:
+    def teardown(deinit self) raises FatalCloseError:
         """Teardown the listener socket on destruction.
 
         Raises:
@@ -196,17 +196,17 @@ struct NoTLSListener[network: NetworkType = NetworkType.tcp4](Movable):
         """
         self.socket^.teardown()
 
-    fn addr(self) -> TCPAddr[Self.network]:
+    def addr(self) -> TCPAddr[Self.network]:
         return self.socket.local_address
 
 
 struct ListenConfig:
     var _keep_alive: Duration
 
-    fn __init__(out self, keep_alive: Duration = default_tcp_keep_alive):
+    def __init__(out self, keep_alive: Duration = default_tcp_keep_alive):
         self._keep_alive = keep_alive
 
-    fn listen[
+    def listen[
         network: NetworkType = NetworkType.tcp4
     ](self, address: StringSlice) raises ListenerError -> NoTLSListener[network]:
         """Create a TCP listener on the specified address.
@@ -313,33 +313,33 @@ struct ConnectionState(Copyable):
     var body_state: RequestBodyState
 
     @staticmethod
-    fn reading_headers() -> Self:
+    def reading_headers() -> Self:
         return ConnectionState(Self.READING_HEADERS, RequestBodyState(0, 0))
 
     @staticmethod
-    fn reading_body(content_length: Int) -> Self:
+    def reading_body(content_length: Int) -> Self:
         return ConnectionState(Self.READING_BODY, RequestBodyState(content_length, 0))
 
     @staticmethod
-    fn processing() -> Self:
+    def processing() -> Self:
         return ConnectionState(Self.PROCESSING, RequestBodyState(0, 0))
 
     @staticmethod
-    fn responding() -> Self:
+    def responding() -> Self:
         return ConnectionState(Self.RESPONDING, RequestBodyState(0, 0))
 
     @staticmethod
-    fn closed() -> Self:
+    def closed() -> Self:
         return ConnectionState(Self.CLOSED, RequestBodyState(0, 0))
 
 
 struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
     var socket: TCPSocket[TCPAddr[Self.network]]
 
-    fn __init__(out self, var socket: TCPSocket[TCPAddr[Self.network]]):
+    def __init__(out self, var socket: TCPSocket[TCPAddr[Self.network]]):
         self.socket = socket^
 
-    fn read(self, mut buf: Bytes) raises SocketRecvError -> UInt:
+    def read(self, mut buf: Bytes) raises SocketRecvError -> UInt:
         """Read data from the TCP connection.
 
         Args:
@@ -353,7 +353,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         return self.socket.receive(buf)
 
-    fn write(self, buf: Span[Byte, _]) raises SendError -> UInt:
+    def write(self, buf: Span[Byte, _]) raises SendError -> UInt:
         """Write all data to the TCP connection, handling partial sends.
 
         Args:
@@ -371,7 +371,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
             total_sent += sent
         return total_sent
 
-    fn set_recv_timeout(self, seconds: Int) raises SetsockoptError:
+    def set_recv_timeout(self, seconds: Int) raises SetsockoptError:
         """Set the receive timeout on this connection's socket.
 
         Args:
@@ -382,7 +382,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         self.socket.set_timeout(seconds)
 
-    fn close(mut self) raises FatalCloseError:
+    def close(mut self) raises FatalCloseError:
         """Close the TCP connection.
 
         Raises:
@@ -390,7 +390,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         self.socket.close()
 
-    fn shutdown(mut self) raises ShutdownEINVALError:
+    def shutdown(mut self) raises ShutdownEINVALError:
         """Shutdown the TCP connection.
 
         Raises:
@@ -398,7 +398,7 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         self.socket.shutdown()
 
-    fn teardown(deinit self) raises FatalCloseError:
+    def teardown(deinit self) raises FatalCloseError:
         """Teardown the connection on destruction.
 
         Raises:
@@ -406,14 +406,14 @@ struct TCPConnection[network: NetworkType = NetworkType.tcp4]:
         """
         self.socket^.teardown()
 
-    fn is_closed(self) -> Bool:
+    def is_closed(self) -> Bool:
         return self.socket._closed
 
     # TODO: Switch to property or return ref when trait supports attributes.
-    fn local_addr(self) -> TCPAddr[Self.network]:
+    def local_addr(self) -> TCPAddr[Self.network]:
         return self.socket.local_address
 
-    fn remote_addr(self) -> TCPAddr[Self.network]:
+    def remote_addr(self) -> TCPAddr[Self.network]:
         return self.socket.remote_address
 
 
@@ -428,10 +428,10 @@ struct UDPConnection[
     ]
     var socket: Self._sock_type
 
-    fn __init__(out self, var socket: Self._sock_type):
+    def __init__(out self, var socket: Self._sock_type):
         self.socket = socket^
 
-    fn read_from(mut self, size: Int = default_buffer_size) raises -> Tuple[Bytes, String, UInt16]:
+    def read_from(mut self, size: Int = default_buffer_size) raises -> Tuple[Bytes, String, UInt16]:
         """Reads data from the underlying file descriptor.
 
         Args:
@@ -446,7 +446,7 @@ struct UDPConnection[
 
         return self.socket.receive_from(size)
 
-    fn read_from(mut self, mut dest: Bytes) raises -> Tuple[UInt, String, UInt16]:
+    def read_from(mut self, mut dest: Bytes) raises -> Tuple[UInt, String, UInt16]:
         """Reads data from the underlying file descriptor.
 
         Args:
@@ -461,7 +461,7 @@ struct UDPConnection[
 
         return self.socket.receive_from(dest)
 
-    fn write_to(mut self, src: Span[Byte, _], mut address: UDPAddr) raises SendtoError -> UInt:
+    def write_to(mut self, src: Span[Byte, _], mut address: UDPAddr) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -477,7 +477,7 @@ struct UDPConnection[
 
         return self.socket.send_to(src, address.ip, address.port)
 
-    fn write_to(mut self, src: Span[Byte, _], mut host: String, port: UInt16) raises SendtoError -> UInt:
+    def write_to(mut self, src: Span[Byte, _], mut host: String, port: UInt16) raises SendtoError -> UInt:
         """Writes data to the underlying file descriptor.
 
         Args:
@@ -494,7 +494,7 @@ struct UDPConnection[
 
         return self.socket.send_to(src, host, port)
 
-    fn close(mut self) raises FatalCloseError:
+    def close(mut self) raises FatalCloseError:
         """Close the UDP connection.
 
         Raises:
@@ -502,7 +502,7 @@ struct UDPConnection[
         """
         self.socket.close()
 
-    fn shutdown(mut self) raises ShutdownEINVALError:
+    def shutdown(mut self) raises ShutdownEINVALError:
         """Shutdown the UDP connection.
 
         Raises:
@@ -510,7 +510,7 @@ struct UDPConnection[
         """
         self.socket.shutdown()
 
-    fn teardown(deinit self) raises FatalCloseError:
+    def teardown(deinit self) raises FatalCloseError:
         """Teardown the connection on destruction.
 
         Raises:
@@ -518,13 +518,13 @@ struct UDPConnection[
         """
         self.socket^.teardown()
 
-    fn is_closed(self) -> Bool:
+    def is_closed(self) -> Bool:
         return self.socket._closed
 
-    # fn local_addr(self) -> ref [self.socket.local_address] UDPAddr[network]:
+    # def local_addr(self) -> ref [self.socket.local_address] UDPAddr[network]:
     #     return self.socket.local_address
 
-    # fn remote_addr(self) -> ref [self.socket.remote_address] UDPAddr[network]:
+    # def remote_addr(self) -> ref [self.socket.remote_address] UDPAddr[network]:
     #     return self.socket.remote_address
 
 
@@ -538,30 +538,30 @@ struct CreateConnectionError(Movable, Writable):
     var value: Self.type
 
     @implicit
-    fn __init__(out self, var value: CSocketError):
+    def __init__(out self, var value: CSocketError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: SocketConnectError):
+    def __init__(out self, var value: SocketConnectError):
         self.value = value^
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[CSocketError]():
             writer.write(self.value[CSocketError])
         elif self.value.isa[SocketConnectError]():
             writer.write(self.value[SocketConnectError])
 
-    fn isa[T: AnyType](self) -> Bool:
+    def isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
 
-    fn __getitem__[T: AnyType](self) -> ref [self.value] T:
+    def __getitem__[T: AnyType](self) -> ref [self.value] T:
         return self.value[T]
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
-fn create_connection(mut host: String, port: UInt16) raises CreateConnectionError -> TCPConnection[NetworkType.tcp4]:
+def create_connection(mut host: String, port: UInt16) raises CreateConnectionError -> TCPConnection[NetworkType.tcp4]:
     """Connect to a server using a TCP socket.
 
     Args:

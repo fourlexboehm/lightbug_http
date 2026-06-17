@@ -3,7 +3,7 @@
 from small_time.small_time import SmallTime, now
 
 
-fn format_http_date(time: SmallTime) raises -> String:
+def format_http_date(time: SmallTime) raises -> String:
     """Format a SmallTime as an HTTP date (IMF-fixdate format).
 
     Format: Day, DD Mon YYYY HH:MM:SS GMT
@@ -98,7 +98,7 @@ fn format_http_date(time: SmallTime) raises -> String:
     )
 
 
-fn http_date_now() -> String:
+def http_date_now() -> String:
     """Get current time formatted as HTTP date.
 
     Returns:

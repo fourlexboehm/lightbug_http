@@ -9,7 +9,7 @@ struct HTTPHeader(Copyable):
     var value: String
     var value_len: Int
 
-    fn __init__(out self):
+    def __init__(out self):
         self.name = String()
         self.name_len = 0
         self.value = String()
@@ -20,10 +20,10 @@ struct HTTPHeader(Copyable):
 struct ParseError(Movable, Writable, TrivialRegisterPassable):
     """Invalid HTTP syntax error."""
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write("ParseError: Invalid HTTP syntax")
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -31,10 +31,10 @@ struct ParseError(Movable, Writable, TrivialRegisterPassable):
 struct IncompleteError(Movable, Writable, TrivialRegisterPassable):
     """Need more data to complete parsing."""
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write("IncompleteError: Need more data")
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -46,30 +46,30 @@ struct HTTPParseError(Movable, Writable):
     var value: Self.type
 
     @implicit
-    fn __init__(out self, value: ParseError):
+    def __init__(out self, value: ParseError):
         self.value = value
 
     @implicit
-    fn __init__(out self, value: IncompleteError):
+    def __init__(out self, value: IncompleteError):
         self.value = value
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[ParseError]():
             writer.write(self.value[ParseError])
         elif self.value.isa[IncompleteError]():
             writer.write(self.value[IncompleteError])
 
-    fn isa[T: AnyType](self) -> Bool:
+    def isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
 
-    fn __getitem__[T: AnyType](self) -> ref [self.value] T:
+    def __getitem__[T: AnyType](self) -> ref [self.value] T:
         return self.value[T]
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
-fn try_peek[origin: ImmutOrigin](reader: ByteReader[origin]) -> Optional[UInt8]:
+def try_peek[origin: ImmutOrigin](reader: ByteReader[origin]) -> Optional[UInt8]:
     """Try to peek at current byte, returns None if unavailable."""
     if reader.available():
         try:
@@ -79,7 +79,7 @@ fn try_peek[origin: ImmutOrigin](reader: ByteReader[origin]) -> Optional[UInt8]:
     return None
 
 
-fn try_peek_at[origin: ImmutOrigin](reader: ByteReader[origin], offset: Int) -> Optional[UInt8]:
+def try_peek_at[origin: ImmutOrigin](reader: ByteReader[origin], offset: Int) -> Optional[UInt8]:
     """Try to peek at byte at relative offset, returns None if out of bounds."""
     var abs_pos = reader.read_pos + offset
     if abs_pos < len(reader._inner):
@@ -87,7 +87,7 @@ fn try_peek_at[origin: ImmutOrigin](reader: ByteReader[origin], offset: Int) -> 
     return None
 
 
-fn try_get_byte[origin: ImmutOrigin](mut reader: ByteReader[origin]) -> Optional[UInt8]:
+def try_get_byte[origin: ImmutOrigin](mut reader: ByteReader[origin]) -> Optional[UInt8]:
     """Try to get current byte and advance, returns None if unavailable."""
     if reader.available():
         var byte = reader._inner[reader.read_pos]
@@ -96,7 +96,7 @@ fn try_get_byte[origin: ImmutOrigin](mut reader: ByteReader[origin]) -> Optional
     return None
 
 
-fn create_string_from_reader[origin: ImmutOrigin](reader: ByteReader[origin], start_offset: Int, length: Int) -> String:
+def create_string_from_reader[origin: ImmutOrigin](reader: ByteReader[origin], start_offset: Int, length: Int) -> String:
     """Create a string from a range in the reader."""
     if start_offset >= 0 and start_offset + length <= len(reader._inner):
         var ptr = reader._inner.unsafe_ptr() + start_offset
@@ -104,7 +104,7 @@ fn create_string_from_reader[origin: ImmutOrigin](reader: ByteReader[origin], st
     return String()
 
 
-fn get_token_to_eol[
+def get_token_to_eol[
     origin: ImmutOrigin
 ](mut buf: ByteReader[origin], mut token: String, mut token_len: Int) raises HTTPParseError:
     var token_start = buf.read_pos
@@ -144,7 +144,7 @@ fn get_token_to_eol[
     token = create_string_from_reader(buf, token_start, token_len)
 
 
-fn is_complete[origin: ImmutOrigin](mut buf: ByteReader[origin], last_len: Int) raises HTTPParseError:
+def is_complete[origin: ImmutOrigin](mut buf: ByteReader[origin], last_len: Int) raises HTTPParseError:
     var ret_cnt = 0
     var start_offset = 0 if last_len < 3 else last_len - 3
 
@@ -175,7 +175,7 @@ fn is_complete[origin: ImmutOrigin](mut buf: ByteReader[origin], last_len: Int) 
     raise IncompleteError()
 
 
-fn parse_token[
+def parse_token[
     origin: ImmutOrigin
 ](mut buf: ByteReader[origin], mut token: String, mut token_len: Int, next_char: UInt8,) raises HTTPParseError:
     var buf_start = buf.read_pos
@@ -196,7 +196,7 @@ fn parse_token[
     raise IncompleteError()
 
 
-fn parse_http_version[origin: ImmutOrigin](mut buf: ByteReader[origin], mut minor_version: Int) raises HTTPParseError:
+def parse_http_version[origin: ImmutOrigin](mut buf: ByteReader[origin], mut minor_version: Int) raises HTTPParseError:
     if buf.remaining() < 9:
         raise IncompleteError()
 
@@ -225,7 +225,7 @@ fn parse_http_version[origin: ImmutOrigin](mut buf: ByteReader[origin], mut mino
     buf.increment()
 
 
-fn parse_headers[
+def parse_headers[
     buf_origin: ImmutOrigin, header_origin: MutOrigin
 ](
     mut buf: ByteReader[buf_origin],
@@ -294,7 +294,7 @@ fn parse_headers[
     raise IncompleteError()
 
 
-fn http_parse_request_headers[
+def http_parse_request_headers[
     buf_origin: ImmutOrigin, header_origin: MutOrigin
 ](
     buf_start: UnsafePointer[UInt8, buf_origin],
@@ -413,7 +413,7 @@ fn http_parse_request_headers[
             return -1
 
 
-fn http_parse_response_headers[
+def http_parse_response_headers[
     buf_origin: ImmutOrigin, header_origin: MutOrigin
 ](
     buf_start: UnsafePointer[UInt8, buf_origin],
@@ -486,7 +486,7 @@ fn http_parse_response_headers[
             return -1
 
 
-fn http_parse_headers[
+def http_parse_headers[
     buf_origin: ImmutOrigin, header_origin: MutOrigin
 ](
     buf_start: UnsafePointer[UInt8, buf_origin],

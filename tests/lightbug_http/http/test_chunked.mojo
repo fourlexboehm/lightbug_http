@@ -2,7 +2,7 @@ from lightbug_http.http.chunked import HTTPChunkedDecoder
 from std.testing import TestSuite, assert_equal, assert_false, assert_true
 
 
-fn chunked_at_once_test(
+def chunked_at_once_test(
     line: Int,
     consume_trailer: Bool,
     var encoded: String,
@@ -32,7 +32,7 @@ fn chunked_at_once_test(
         assert_equal(buf[i], decoded_bytes[i])
 
 
-fn chunked_per_byte_test(
+def chunked_per_byte_test(
     line: Int,
     consume_trailer: Bool,
     encoded: String,
@@ -89,7 +89,7 @@ fn chunked_per_byte_test(
         assert_equal(buf[i], decoded_bytes[i])
 
 
-fn chunked_failure_test(line: Int, encoded: String, expected: Int) raises:
+def chunked_failure_test(line: Int, encoded: String, expected: Int) raises:
     """Test chunked decoding failure cases."""
     # Test at-once
     var decoder = HTTPChunkedDecoder()
@@ -125,7 +125,7 @@ fn chunked_failure_test(line: Int, encoded: String, expected: Int) raises:
     assert_equal(ret, expected)
 
 
-fn test_chunked() raises:
+def test_chunked() raises:
     """Test chunked transfer encoding."""
     # Test successful chunked decoding
     chunked_at_once_test(
@@ -166,7 +166,7 @@ fn test_chunked() raises:
     )
 
 
-fn test_chunked_with_trailers() raises:
+def test_chunked_with_trailers() raises:
     # Test with trailers
     chunked_at_once_test(
         0,
@@ -177,13 +177,13 @@ fn test_chunked_with_trailers() raises:
     )
 
 
-fn test_chunked_failures() raises:
+def test_chunked_failures() raises:
     # Test failures
     chunked_failure_test(0, "z\r\nabcdefg", -1)
     chunked_failure_test(0, "1x\r\na\r\n0\r\n", -1)
 
 
-fn test_chunked_failure_line_feed_present() raises:
+def test_chunked_failure_line_feed_present() raises:
     # Bare LF cannot be used in chunk header
     chunked_failure_test(0, "6\nhello \r\n5\r\nworld\r\n0\r\n", -1)
     chunked_failure_test(0, "6\r\nhello \n5\r\nworld\r\n0\r\n", -1)
@@ -191,7 +191,7 @@ fn test_chunked_failure_line_feed_present() raises:
     chunked_failure_test(0, "6\r\nhello \r\n5\r\nworld\r\n0\n", -1)
 
 
-fn test_chunked_consume_trailer() raises:
+def test_chunked_consume_trailer() raises:
     """Test chunked decoding with consume_trailer flag."""
     chunked_at_once_test(
         0, True, "b\r\nhello world\r\n0\r\n", "hello world", -2
@@ -222,14 +222,14 @@ fn test_chunked_consume_trailer() raises:
 #    )
 
 
-fn test_chunked_consume_trailer_with_line_feed() raises:
+def test_chunked_consume_trailer_with_line_feed() raises:
     # Bare LF in trailers
     chunked_at_once_test(
         0, True, String("b\r\nhello world\r\n0\r\n\n"), "hello world", 0
     )
 
 
-fn test_chunked_leftdata() raises:
+def test_chunked_leftdata() raises:
     """Test chunked decoding with leftover data."""
     comptime NEXT_REQ = "GET / HTTP/1.1\r\n\r\n"
 
@@ -263,5 +263,5 @@ fn test_chunked_leftdata() raises:
         assert_equal(buf[new_bufsz + i], next_req_bytes[i])
 
 
-fn main() raises:
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

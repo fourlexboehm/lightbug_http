@@ -2,25 +2,25 @@ from lightbug_http.http.json import Json
 from lightbug_http.io.bytes import Bytes
 
 
-fn OK(var body: Json) -> HTTPResponse:
+def OK(var body: Json) -> HTTPResponse:
     return HTTPResponse(body^)
 
 
-fn OK(body: String, content_type: String = "text/plain") -> HTTPResponse:
+def OK(body: String, content_type: String = "text/plain") -> HTTPResponse:
     return HTTPResponse(
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, content_type)),
         body_bytes=body.as_bytes(),
     )
 
 
-fn OK(body: Bytes, content_type: String = "text/plain") -> HTTPResponse:
+def OK(body: Bytes, content_type: String = "text/plain") -> HTTPResponse:
     return HTTPResponse(
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, content_type)),
         body_bytes=body,
     )
 
 
-fn OK(body: Bytes, content_type: String, content_encoding: String) -> HTTPResponse:
+def OK(body: Bytes, content_type: String, content_encoding: String) -> HTTPResponse:
     return HTTPResponse(
         headers=Headers(
             Header(HeaderKey.CONTENT_TYPE, content_type),
@@ -30,7 +30,7 @@ fn OK(body: Bytes, content_type: String, content_encoding: String) -> HTTPRespon
     )
 
 
-fn SeeOther(location: String, content_type: String, var cookies: List[Cookie] = []) -> HTTPResponse:
+def SeeOther(location: String, content_type: String, var cookies: List[Cookie] = []) -> HTTPResponse:
     return HTTPResponse(
         "See Other".as_bytes(),
         cookies=ResponseCookieJar(cookies^),
@@ -43,7 +43,7 @@ fn SeeOther(location: String, content_type: String, var cookies: List[Cookie] = 
     )
 
 
-fn BadRequest() -> HTTPResponse:
+def BadRequest() -> HTTPResponse:
     return HTTPResponse(
         "Bad Request".as_bytes(),
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, "text/plain")),
@@ -52,7 +52,7 @@ fn BadRequest() -> HTTPResponse:
     )
 
 
-fn BadRequest(message: String) -> HTTPResponse:
+def BadRequest(message: String) -> HTTPResponse:
     """Bad Request with a specific error message.
 
     Args:
@@ -66,7 +66,7 @@ fn BadRequest(message: String) -> HTTPResponse:
     )
 
 
-fn NotFound(path: String) -> HTTPResponse:
+def NotFound(path: String) -> HTTPResponse:
     return HTTPResponse(
         body_bytes=String("path ", path, " not found").as_bytes(),
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, "text/plain")),
@@ -75,7 +75,7 @@ fn NotFound(path: String) -> HTTPResponse:
     )
 
 
-fn PayloadTooLarge() -> HTTPResponse:
+def PayloadTooLarge() -> HTTPResponse:
     return HTTPResponse(
         "Payload Too Large".as_bytes(),
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, "text/plain")),
@@ -84,7 +84,7 @@ fn PayloadTooLarge() -> HTTPResponse:
     )
 
 
-fn URITooLong() -> HTTPResponse:
+def URITooLong() -> HTTPResponse:
     return HTTPResponse(
         "URI Too Long".as_bytes(),
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, "text/plain")),
@@ -93,7 +93,7 @@ fn URITooLong() -> HTTPResponse:
     )
 
 
-fn InternalError() -> HTTPResponse:
+def InternalError() -> HTTPResponse:
     return HTTPResponse(
         "Failed to process request".as_bytes(),
         headers=Headers(Header(HeaderKey.CONTENT_TYPE, "text/plain")),

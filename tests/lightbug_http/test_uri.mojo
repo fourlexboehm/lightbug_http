@@ -2,7 +2,7 @@ from lightbug_http.uri import URI
 from std.testing import TestSuite, assert_equal, assert_false, assert_raises, assert_true
 
 
-fn test_uri_no_parse_defaults() raises:
+def test_uri_no_parse_defaults() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com")
@@ -14,7 +14,7 @@ fn test_uri_no_parse_defaults() raises:
     assert_equal(uri.path, "/")
 
 
-fn test_uri_parse_http_with_port() raises:
+def test_uri_parse_http_with_port() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com:8080/index.html")
@@ -32,7 +32,7 @@ fn test_uri_parse_http_with_port() raises:
     assert_equal(uri.query_string, "")
 
 
-fn test_uri_parse_https_with_port() raises:
+def test_uri_parse_https_with_port() raises:
     var uri: URI
     try:
         uri = URI.parse("https://example.com:8080/index.html")
@@ -50,7 +50,7 @@ fn test_uri_parse_https_with_port() raises:
     assert_equal(uri.query_string, "")
 
 
-fn test_uri_parse_http_with_path() raises:
+def test_uri_parse_http_with_path() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com/index.html")
@@ -67,7 +67,7 @@ fn test_uri_parse_http_with_path() raises:
     assert_equal(uri.query_string, "")
 
 
-fn test_uri_parse_https_with_path() raises:
+def test_uri_parse_https_with_path() raises:
     var uri: URI
     try:
         uri = URI.parse("https://example.com/index.html")
@@ -85,17 +85,17 @@ fn test_uri_parse_https_with_path() raises:
 
 
 # TODO: Index OOB Error
-# fn test_uri_parse_path_with_encoding() raises:
+# def test_uri_parse_path_with_encoding() raises:
 #     var uri = URI.parse("https://example.com/test%20test/index.html")
 #     assert_equal(uri.path, "/test test/index.html")
 
 # TODO: Index OOB Error
-# fn test_uri_parse_path_with_encoding_ignore_slashes() raises:
+# def test_uri_parse_path_with_encoding_ignore_slashes() raises:
 #     var uri = URI.parse("https://example.com/trying_to%2F_be_clever/42.html")
 #     assert_equal(uri.path, "/trying_to_be_clever/42.html")
 
 
-fn test_uri_parse_http_basic() raises:
+def test_uri_parse_http_basic() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com")
@@ -110,7 +110,7 @@ fn test_uri_parse_http_basic() raises:
     assert_equal(uri.query_string, "")
 
 
-fn test_uri_parse_http_basic_www() raises:
+def test_uri_parse_http_basic_www() raises:
     var uri: URI
     try:
         uri = URI.parse("http://www.example.com")
@@ -125,7 +125,7 @@ fn test_uri_parse_http_basic_www() raises:
     assert_equal(uri.query_string, "")
 
 
-fn test_uri_parse_http_with_query_string() raises:
+def test_uri_parse_http_with_query_string() raises:
     var uri: URI
     try:
         uri = URI.parse("http://www.example.com/job?title=engineer")
@@ -141,7 +141,7 @@ fn test_uri_parse_http_with_query_string() raises:
     assert_equal(uri.queries["title"], "engineer")
 
 
-fn test_uri_parse_multiple_query_parameters() raises:
+def test_uri_parse_multiple_query_parameters() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com/search?q=python&page=1&limit=20")
@@ -159,7 +159,7 @@ fn test_uri_parse_multiple_query_parameters() raises:
 
 
 # TODO: Index OOB Error
-# fn test_uri_parse_query_with_special_characters() raises:
+# def test_uri_parse_query_with_special_characters() raises:
 #     var uri = URI.parse("https://example.com/path?name=John+Doe&email=john%40example.com&escaped%40%20name=42")
 #     assert_equal(uri.scheme, "https")
 #     assert_equal(uri.host, "example.com")
@@ -170,7 +170,7 @@ fn test_uri_parse_multiple_query_parameters() raises:
 #     assert_equal(uri.queries["escaped@ name"], "42")
 
 
-fn test_uri_parse_empty_query_values() raises:
+def test_uri_parse_empty_query_values() raises:
     var uri: URI
     try:
         uri = URI.parse("http://example.com/api?key=&token=&empty")
@@ -183,7 +183,7 @@ fn test_uri_parse_empty_query_values() raises:
     assert_equal(uri.queries["empty"], "")
 
 
-fn test_uri_parse_complex_query() raises:
+def test_uri_parse_complex_query() raises:
     var uri: URI
     try:
         uri = URI.parse(
@@ -207,21 +207,21 @@ fn test_uri_parse_complex_query() raises:
 
 
 # TODO: Index OOB Error
-# fn test_uri_parse_query_with_unicode() raises:
+# def test_uri_parse_query_with_unicode() raises:
 #     var uri = URI.parse("http://example.com/search?q=%E2%82%AC&lang=%F0%9F%87%A9%F0%9F%87%AA")
 #     assert_equal(uri.query_string, "q=%E2%82%AC&lang=%F0%9F%87%A9%F0%9F%87%AA")
 #     assert_equal(uri.queries["q"], "€")
 #     assert_equal(uri.queries["lang"], "🇩🇪")
 
 
-# fn test_uri_parse_query_with_fragments() raises:
+# def test_uri_parse_query_with_fragments() raises:
 #     var uri = URI.parse("http://example.com/page?id=123#section1")
 #     assert_equal(uri.query_string, "id=123")
 #     assert_equal(uri.queries["id"], "123")
 #     assert_equal(...) - how do we treat fragments?
 
 
-fn test_uri_parse_no_scheme() raises:
+def test_uri_parse_no_scheme() raises:
     var uri: URI
     try:
         uri = URI.parse("www.example.com")
@@ -232,7 +232,7 @@ fn test_uri_parse_no_scheme() raises:
     assert_equal(uri.host, "www.example.com")
 
 
-fn test_uri_ip_address_no_scheme() raises:
+def test_uri_ip_address_no_scheme() raises:
     var uri: URI
     try:
         uri = URI.parse("168.22.0.1/path/to/favicon.ico")
@@ -244,7 +244,7 @@ fn test_uri_ip_address_no_scheme() raises:
     assert_equal(uri.path, "/path/to/favicon.ico")
 
 
-fn test_uri_ip_address() raises:
+def test_uri_ip_address() raises:
     var uri: URI
     try:
         uri = URI.parse("http://168.22.0.1:8080/path/to/favicon.ico")
@@ -257,9 +257,9 @@ fn test_uri_ip_address() raises:
     assert_equal(uri.port.value(), 8080)
 
 
-# fn test_uri_parse_http_with_hash() raises:
+# def test_uri_parse_http_with_hash() raises:
 #     ...
 
 
-fn main() raises:
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

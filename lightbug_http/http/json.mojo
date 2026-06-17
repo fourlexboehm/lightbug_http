@@ -15,11 +15,11 @@ struct Json:
 
     var _serialized: String
 
-    fn __init__[T: AnyType](out self, value: T):
+    def __init__[T: AnyType](out self, value: T):
         self._serialized = serialize(value)
 
 
-fn json_decode(req: HTTPRequest) raises -> Value:
+def json_decode(req: HTTPRequest) raises -> Value:
     """Parse the request body as untyped JSON.
 
     Args:
@@ -34,7 +34,7 @@ fn json_decode(req: HTTPRequest) raises -> Value:
     return parse(req.get_body())
 
 
-fn json_decode[T: Movable & ImplicitlyDestructible](req: HTTPRequest) raises -> T:
+def json_decode[T: Movable & ImplicitlyDestructible](req: HTTPRequest) raises -> T:
     """Deserialize the request body into a typed struct.
 
     Parameters:

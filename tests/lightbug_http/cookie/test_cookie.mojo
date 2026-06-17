@@ -6,7 +6,7 @@ from std.testing import TestSuite, assert_equal, assert_true
 from lightbug_http.cookie import Cookie, Duration, Expiration, SameSite
 
 
-fn test_set_cookie() raises:
+def test_set_cookie() raises:
     cookie = Cookie(
         name="mycookie",
         value="myvalue",
@@ -26,7 +26,7 @@ fn test_set_cookie() raises:
     assert_equal(header_value, expected)
 
 
-fn test_set_cookie_partial_arguments() raises:
+def test_set_cookie_partial_arguments() raises:
     cookie = Cookie(
         name="mycookie", value="myvalue", same_site=materialize[SameSite.lax]()
     )
@@ -37,7 +37,7 @@ fn test_set_cookie_partial_arguments() raises:
     assert_equal(header_value, expected)
 
 
-fn test_expires_http_timestamp_format() raises:
+def test_expires_http_timestamp_format() raises:
     var expected = "Thu, 22 Jan 2037 12:00:10 GMT"
     var http_date = Expiration.from_datetime(
         SmallTime(2037, 1, 22, 12, 0, 10, 0)

@@ -14,7 +14,7 @@ from lightbug_http import (
 
 @fieldwise_init
 struct IntegrationTestService(HTTPService):
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         var p = req.uri.path
         if p == "/":
             return OK("hello")
@@ -36,7 +36,7 @@ struct IntegrationTestService(HTTPService):
         return NotFound("wrong")
 
 
-fn main() raises:
+def main() raises:
     var server = Server()
     var service = IntegrationTestService()
     server.listen_and_serve("127.0.0.1:8080", service)

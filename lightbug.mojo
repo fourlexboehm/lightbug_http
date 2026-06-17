@@ -3,7 +3,7 @@ from lightbug_http.server import Server
 from std.os.env import getenv
 
 
-fn main() raises:
+def main() raises:
     var server = Server()
     var handler = Welcome()
 

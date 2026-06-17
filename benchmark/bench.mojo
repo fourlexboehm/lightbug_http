@@ -20,11 +20,11 @@ comptime Request = "GET /index.html HTTP/1.1\r\nHost: example.com\r\nUser-Agent:
 comptime Response = "HTTP/1.1 200 OK\r\nserver: lightbug_http\r\ncontent-type: application/octet-stream\r\nconnection: keep-alive\r\ncontent-length: 13\r\ndate: 2024-06-02T13:41:50.766880+00:00\r\n\r\n" + body
 
 
-fn main():
+def main():
     run_benchmark()
 
 
-fn run_benchmark():
+def run_benchmark():
     try:
         var config = BenchConfig()
         config.verbose_timing = True
@@ -62,10 +62,10 @@ comptime headers_struct = Headers(
 
 
 @parameter
-fn lightbug_benchmark_response_encode(mut b: Bencher):
+def lightbug_benchmark_response_encode(mut b: Bencher):
     @always_inline
     @parameter
-    fn response_encode():
+    def response_encode():
         var res = HTTPResponse(
             body.as_bytes(), headers=materialize[headers_struct]()
         )
@@ -75,10 +75,10 @@ fn lightbug_benchmark_response_encode(mut b: Bencher):
 
 
 @parameter
-fn lightbug_benchmark_response_parse(mut b: Bencher):
+def lightbug_benchmark_response_parse(mut b: Bencher):
     @always_inline
     @parameter
-    fn response_parse():
+    def response_parse():
         try:
             _ = HTTPResponse.from_bytes(Response.as_bytes())
         except:
@@ -88,10 +88,10 @@ fn lightbug_benchmark_response_parse(mut b: Bencher):
 
 
 @parameter
-fn lightbug_benchmark_request_parse(mut b: Bencher):
+def lightbug_benchmark_request_parse(mut b: Bencher):
     @always_inline
     @parameter
-    fn request_parse():
+    def request_parse():
         try:
             var parsed = parse_request_headers(Span(Request.as_bytes()))
             try:
@@ -110,10 +110,10 @@ fn lightbug_benchmark_request_parse(mut b: Bencher):
 
 
 @parameter
-fn lightbug_benchmark_request_encode(mut b: Bencher):
+def lightbug_benchmark_request_encode(mut b: Bencher):
     @always_inline
     @parameter
-    fn request_encode() raises:
+    def request_encode() raises:
         try:
             var req = HTTPRequest(
                 uri=URI.parse("http://127.0.0.1:8080/some-path"),
@@ -132,10 +132,10 @@ fn lightbug_benchmark_request_encode(mut b: Bencher):
 
 
 @parameter
-fn lightbug_benchmark_header_encode(mut b: Bencher):
+def lightbug_benchmark_header_encode(mut b: Bencher):
     @always_inline
     @parameter
-    fn header_encode():
+    def header_encode():
         var b = ByteWriter()
         b.write(materialize[headers_struct]())
 
@@ -143,10 +143,10 @@ fn lightbug_benchmark_header_encode(mut b: Bencher):
 
 
 @parameter
-fn lightbug_benchmark_header_parse(mut b: Bencher):
+def lightbug_benchmark_header_parse(mut b: Bencher):
     @always_inline
     @parameter
-    fn header_parse():
+    def header_parse():
         try:
             _ = parse_request_headers(Span(headers.as_bytes()))
         except e:

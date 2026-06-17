@@ -5,13 +5,13 @@ from lightbug_http.http import OK, HTTPRequest, HTTPResponse, NotFound
 
 
 trait HTTPService:
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         ...
 
 
 @fieldwise_init
 struct Printer(HTTPService):
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         print("Request URI:", req.uri.request_uri)
         print("Request protocol:", req.protocol)
         print("Request method:", req.method)
@@ -25,7 +25,7 @@ struct Printer(HTTPService):
 
 @fieldwise_init
 struct Welcome(HTTPService):
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         if req.uri.path == "/":
             with open("static/lightbug_welcome.html", "r") as f:
                 return OK(Bytes(f.read_bytes()), "text/html; charset=utf-8")
@@ -39,7 +39,7 @@ struct Welcome(HTTPService):
 
 @fieldwise_init
 struct ExampleRouter(HTTPService):
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         if req.uri.path == "/":
             print("I'm on the index path!")
         if req.uri.path == "/first":
@@ -54,7 +54,7 @@ struct ExampleRouter(HTTPService):
 
 @fieldwise_init
 struct TechEmpowerRouter(HTTPService):
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         if req.uri.path == "/plaintext":
             return OK("Hello, World!", "text/plain")
         elif req.uri.path == "/json":
@@ -67,9 +67,9 @@ struct TechEmpowerRouter(HTTPService):
 struct Counter(HTTPService):
     var counter: Int
 
-    fn __init__(out self):
+    def __init__(out self):
         self.counter = 0
 
-    fn func(mut self, req: HTTPRequest) raises -> HTTPResponse:
+    def func(mut self, req: HTTPRequest) raises -> HTTPResponse:
         self.counter += 1
         return OK("I have been called: " + String(self.counter) + " times")

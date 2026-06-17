@@ -12,10 +12,10 @@ from std.utils import StaticTuple, Variant
 struct InetNtopEAFNOSUPPORTError(CustomError, TrivialRegisterPassable):
     comptime message = "inet_ntop Error (EAFNOSUPPORT): `*src` was not an `AF_INET` or `AF_INET6` family address."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -23,10 +23,10 @@ struct InetNtopEAFNOSUPPORTError(CustomError, TrivialRegisterPassable):
 struct InetNtopENOSPCError(CustomError, TrivialRegisterPassable):
     comptime message = "inet_ntop Error (ENOSPC): The buffer size was not large enough to store the presentation form of the address."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -34,10 +34,10 @@ struct InetNtopENOSPCError(CustomError, TrivialRegisterPassable):
 struct InetPtonInvalidAddressError(CustomError, TrivialRegisterPassable):
     comptime message = "inet_pton Error: The input is not a valid address."
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(Self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return Self.message
 
 
@@ -47,7 +47,7 @@ comptime InetNtopError = Variant[InetNtopEAFNOSUPPORTError, InetNtopENOSPCError,
 comptime InetPtonError = Variant[InetPtonInvalidAddressError, Error]
 
 
-fn htonl(hostlong: c_uint) -> c_uint:
+def htonl(hostlong: c_uint) -> c_uint:
     """Libc POSIX `htonl` function.
 
     Args:
@@ -67,7 +67,7 @@ fn htonl(hostlong: c_uint) -> c_uint:
     return external_call["htonl", c_uint, type_of(hostlong)](hostlong)
 
 
-fn htons(hostshort: c_ushort) -> c_ushort:
+def htons(hostshort: c_ushort) -> c_ushort:
     """Libc POSIX `htons` function.
 
     Args:
@@ -87,7 +87,7 @@ fn htons(hostshort: c_ushort) -> c_ushort:
     return external_call["htons", c_ushort, type_of(hostshort)](hostshort)
 
 
-fn ntohl(netlong: c_uint) -> c_uint:
+def ntohl(netlong: c_uint) -> c_uint:
     """Libc POSIX `ntohl` function.
 
     Args:
@@ -107,7 +107,7 @@ fn ntohl(netlong: c_uint) -> c_uint:
     return external_call["ntohl", c_uint, type_of(netlong)](netlong)
 
 
-fn ntohs(netshort: c_ushort) -> c_ushort:
+def ntohs(netshort: c_ushort) -> c_ushort:
     """Libc POSIX `ntohs` function.
 
     Args:
@@ -151,7 +151,7 @@ struct sockaddr(TrivialRegisterPassable):
     var sa_family: sa_family_t
     var sa_data: StaticTuple[c_char, 14]
 
-    fn __init__(
+    def __init__(
         out self,
         family: sa_family_t = 0,
         data: StaticTuple[c_char, 14] = StaticTuple[c_char, 14](),
@@ -167,7 +167,7 @@ struct sockaddr_in(TrivialRegisterPassable):
     var sin_addr: in_addr
     var sin_zero: StaticTuple[c_char, 8]
 
-    fn __init__(out self, address_family: Int, port: UInt16, binary_ip: UInt32):
+    def __init__(out self, address_family: Int, port: UInt16, binary_ip: UInt32):
         """Construct a sockaddr_in struct.
 
         Args:
@@ -199,10 +199,10 @@ struct SocketAddress(Movable):
     var addr: ExternalMutUnsafePointer[sockaddr]
     """Pointer to the underlying sockaddr struct."""
 
-    fn __init__(out self):
+    def __init__(out self):
         self.addr = alloc[sockaddr](count=1)
 
-    fn __init__(out self, address_family: AddressFamily, port: UInt16, binary_ip: UInt32):
+    def __init__(out self, address_family: AddressFamily, port: UInt16, binary_ip: UInt32):
         """Construct a SocketAddress from address family, port and binary IP.
 
         This constructor creates a `sockaddr_in` struct owned by a pointer, then casts it to `sockaddr` and
@@ -223,16 +223,16 @@ struct SocketAddress(Movable):
         )
         self.addr = sockaddr_in_ptr.bitcast[sockaddr]()
 
-    fn __del__(deinit self):
+    def __del__(deinit self):
         if self.addr:
             self.addr.free()
 
-    fn unsafe_ptr[
+    def unsafe_ptr[
         origin: Origin, address_space: AddressSpace, //
     ](ref [origin, address_space]self) -> UnsafePointer[sockaddr, origin, address_space=address_space]:
         return self.addr.unsafe_mut_cast[origin.mut]().unsafe_origin_cast[origin]().address_space_cast[address_space]()
 
-    fn as_sockaddr_in(mut self) -> ref [origin_of(self)] sockaddr_in:
+    def as_sockaddr_in(mut self) -> ref [origin_of(self)] sockaddr_in:
         return self.unsafe_ptr().bitcast[sockaddr_in]()[]
 
 
@@ -247,7 +247,7 @@ struct addrinfo(TrivialRegisterPassable):
     var ai_canonname: ExternalMutUnsafePointer[c_char]
     var ai_next: ExternalMutUnsafePointer[c_void]
 
-    fn __init__(out self):
+    def __init__(out self):
         self.ai_flags = 0
         self.ai_family = 0
         self.ai_socktype = 0
@@ -258,7 +258,7 @@ struct addrinfo(TrivialRegisterPassable):
         self.ai_next = ExternalMutUnsafePointer[c_void]()
 
 
-fn _inet_ntop(
+def _inet_ntop(
     af: c_int,
     src: ImmutUnsafePointer[c_void, _],
     dst: MutUnsafePointer[c_char, _],
@@ -293,7 +293,7 @@ fn _inet_ntop(
     ](af, src, dst, size)
 
 
-fn inet_ntop[
+def inet_ntop[
     address_family: AddressFamily, address_length: AddressLength
 ](ip_address: UInt32) raises InetNtopError -> String:
     """Libc POSIX `inet_ntop` function.
@@ -344,7 +344,7 @@ fn inet_ntop[
     return String(unsafe_from_utf8_ptr=dst.unsafe_ptr())
 
 
-fn _inet_pton(af: c_int, src: ImmutUnsafePointer[c_char, _], dst: MutUnsafePointer[c_void, _]) -> c_int:
+def _inet_pton(af: c_int, src: ImmutUnsafePointer[c_char, _], dst: MutUnsafePointer[c_void, _]) -> c_int:
     """Libc POSIX `inet_pton` function. Converts a presentation format address (that is, printable form as held in a character string)
     to network format (usually a struct in_addr or some other internal binary representation, in network byte order).
     It returns 1 if the address was valid for the specified address family, or 0 if the address was not parseable in the specified address family,
@@ -375,7 +375,7 @@ fn _inet_pton(af: c_int, src: ImmutUnsafePointer[c_char, _], dst: MutUnsafePoint
     ](af, src, dst)
 
 
-fn inet_pton[address_family: AddressFamily](var src: String) raises InetPtonError -> c_uint:
+def inet_pton[address_family: AddressFamily](var src: String) raises InetPtonError -> c_uint:
     """Libc POSIX `inet_pton` function. Converts a presentation format address (that is, printable form as held in a character string)
     to network format (usually a struct in_addr or some other internal binary representation, in network byte order).
 

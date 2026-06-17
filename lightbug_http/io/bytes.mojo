@@ -10,29 +10,29 @@ comptime Bytes = List[Byte]
 
 
 @always_inline
-fn byte[s: StringSlice]() -> Byte:
+def byte[s: StringSlice]() -> Byte:
     comptime assert len(s) == 1, "StringSlice must be of length 1 to convert to Byte."
     return s.as_bytes()[0]
 
 
 @always_inline
-fn is_newline(b: Byte) -> Bool:
+def is_newline(b: Byte) -> Bool:
     return b == BytesConstant.LF or b == BytesConstant.CR
 
 
 @always_inline
-fn is_space(b: Byte) -> Bool:
+def is_space(b: Byte) -> Bool:
     return b == BytesConstant.whitespace
 
 
 struct ByteWriter(Writer):
     var _inner: Bytes
 
-    fn __init__(out self, capacity: Int = default_buffer_size):
+    def __init__(out self, capacity: Int = default_buffer_size):
         self._inner = Bytes(capacity=capacity)
 
     @always_inline
-    fn write_string(mut self, bytes: Span[Byte, _]) -> None:
+    def write_string(mut self, bytes: Span[Byte, _]) -> None:
         """Writes the contents of `bytes` into the internal buffer.
 
         Args:
@@ -40,7 +40,7 @@ struct ByteWriter(Writer):
         """
         self._inner.extend(bytes)
 
-    fn write_string(mut self, s: StringSlice) -> None:
+    def write_string(mut self, s: StringSlice) -> None:
         """Writes the contents of `s` into the internal buffer.
 
         Args:
@@ -48,7 +48,7 @@ struct ByteWriter(Writer):
         """
         self._inner.extend(s.as_bytes())
 
-    fn write[*Ts: Writable](mut self, *args: *Ts) -> None:
+    def write[*Ts: Writable](mut self, *args: *Ts) -> None:
         """Write data to the `Writer`.
 
         Parameters:
@@ -62,10 +62,10 @@ struct ByteWriter(Writer):
             args[i].write_to(self)
 
     @always_inline
-    fn consuming_write(mut self, var b: Bytes):
+    def consuming_write(mut self, var b: Bytes):
         self._inner.extend(b^)
 
-    fn consume(deinit self) -> Bytes:
+    def consume(deinit self) -> Bytes:
         return self._inner^
 
 
@@ -75,22 +75,22 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
     var _inner: Span[Byte, Self.origin]
 
     @implicit
-    fn __init__(out self, b: Span[Byte, Self.origin]):
+    def __init__(out self, b: Span[Byte, Self.origin]):
         self._inner = b
 
-    fn __len__(self) -> Int:
+    def __len__(self) -> Int:
         return len(self._inner)
 
-    fn __bool__(self) -> Bool:
+    def __bool__(self) -> Bool:
         return Bool(self._inner)
 
-    fn __contains__(self, b: Byte) -> Bool:
+    def __contains__(self, b: Byte) -> Bool:
         for i in range(len(self._inner)):
             if self._inner[i] == b:
                 return True
         return False
 
-    fn __contains__(self, b: Span[Byte, _]) -> Bool:
+    def __contains__(self, b: Span[Byte, _]) -> Bool:
         if len(b) > len(self._inner):
             return False
 
@@ -104,19 +104,19 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
                 return True
         return False
 
-    fn __getitem__(self, index: Int) -> Byte:
+    def __getitem__(self, index: Int) -> Byte:
         return self._inner[index]
 
-    fn __getitem__(self, slc: ContiguousSlice) -> Self:
+    def __getitem__(self, slc: ContiguousSlice) -> Self:
         return Self(self._inner[slc])
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(StringSlice(unsafe_from_utf8=self._inner))
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
-    fn __eq__(self, other: Self) -> Bool:
+    def __eq__(self, other: Self) -> Bool:
         # both empty
         if not self._inner and not other._inner:
             return True
@@ -128,7 +128,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
                 return False
         return True
 
-    fn __eq__(self, other: Span[Byte, _]) -> Bool:
+    def __eq__(self, other: Span[Byte, _]) -> Bool:
         # both empty
         if not self._inner and not other:
             return True
@@ -140,7 +140,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
                 return False
         return True
 
-    fn __eq__(self, other: Bytes) -> Bool:
+    def __eq__(self, other: Bytes) -> Bool:
         # Check if lengths match
         if len(self) != len(other):
             return False
@@ -151,13 +151,13 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
                 return False
         return True
 
-    fn __ne__(self, other: Span[Byte, _]) -> Bool:
+    def __ne__(self, other: Span[Byte, _]) -> Bool:
         return not self == other
 
-    fn __iter__(self) -> _SpanIter[Byte, Self.origin]:
+    def __iter__(self) -> _SpanIter[Byte, Self.origin]:
         return self._inner.__iter__()
 
-    fn find(self, target: Byte) -> Int:
+    def find(self, target: Byte) -> Int:
         """Finds the index of a byte in a byte span.
 
         Args:
@@ -172,7 +172,7 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
 
         return -1
 
-    fn as_bytes(self) -> Span[Byte, Self.origin]:
+    def as_bytes(self) -> Span[Byte, Self.origin]:
         return self._inner
 
 
@@ -180,13 +180,13 @@ struct ByteView[origin: ImmutOrigin](Boolable, Copyable, Equatable, Sized, Writa
 struct OutOfBoundsError(Writable):
     var message: String
 
-    fn __init__(out self):
+    def __init__(out self):
         self.message = "Tried to read past the end of the ByteReader."
 
-    fn write_to[W: Writer, //](self, mut writer: W) -> None:
+    def write_to[W: Writer, //](self, mut writer: W) -> None:
         writer.write(self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return self.message.copy()
 
 
@@ -194,13 +194,13 @@ struct OutOfBoundsError(Writable):
 struct EndOfReaderError(Writable):
     var message: String
 
-    fn __init__(out self):
+    def __init__(out self):
         self.message = "No more bytes to read."
 
-    fn write_to[W: Writer, //](self, mut writer: W) -> None:
+    def write_to[W: Writer, //](self, mut writer: W) -> None:
         writer.write(self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return self.message.copy()
 
 
@@ -208,44 +208,44 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
     var _inner: Span[Byte, Self.origin]
     var read_pos: Int
 
-    fn __init__(out self, b: Span[Byte, Self.origin]):
+    def __init__(out self, b: Span[Byte, Self.origin]):
         self._inner = b
         self.read_pos = 0
 
-    fn copy(self) -> Self:
+    def copy(self) -> Self:
         return ByteReader(self._inner[self.read_pos :])
 
-    fn as_bytes(self) -> Span[Byte, Self.origin]:
+    def as_bytes(self) -> Span[Byte, Self.origin]:
         return self._inner[self.read_pos :]
 
-    fn __contains__(self, b: Byte) -> Bool:
+    def __contains__(self, b: Byte) -> Bool:
         for i in range(self.read_pos, len(self._inner)):
             if self._inner[i] == b:
                 return True
         return False
 
     @always_inline
-    fn available(self) -> Bool:
+    def available(self) -> Bool:
         return self.read_pos < len(self._inner)
 
-    fn __len__(self) -> Int:
+    def __len__(self) -> Int:
         return len(self._inner) - self.read_pos
 
-    fn remaining(self) -> Int:
+    def remaining(self) -> Int:
         return len(self._inner) - self.read_pos
 
-    fn peek(self) raises EndOfReaderError -> Byte:
+    def peek(self) raises EndOfReaderError -> Byte:
         if not self.available():
             raise EndOfReaderError()
         return self._inner[self.read_pos]
 
-    fn read_bytes(mut self) -> ByteView[Self.origin]:
+    def read_bytes(mut self) -> ByteView[Self.origin]:
         var count = len(self)
         var start = self.read_pos
         self.read_pos += count
         return self._inner[start : start + count]
 
-    fn read_bytes(mut self, n: Int) raises OutOfBoundsError -> ByteView[Self.origin]:
+    def read_bytes(mut self, n: Int) raises OutOfBoundsError -> ByteView[Self.origin]:
         if self.read_pos + n > len(self._inner):
             raise OutOfBoundsError()
         var count = n
@@ -253,7 +253,7 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
         self.read_pos += count
         return self._inner[start : start + count]
 
-    fn read_until(mut self, char: Byte) -> ByteView[Self.origin]:
+    def read_until(mut self, char: Byte) -> ByteView[Self.origin]:
         var start = self.read_pos
         for i in range(start, len(self._inner)):
             if self._inner[i] == char:
@@ -263,10 +263,10 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
         return self._inner[start : self.read_pos]
 
     @always_inline
-    fn read_word(mut self) -> ByteView[Self.origin]:
+    def read_word(mut self) -> ByteView[Self.origin]:
         return self.read_until(BytesConstant.whitespace)
 
-    fn read_line(mut self) -> ByteView[Self.origin]:
+    def read_line(mut self) -> ByteView[Self.origin]:
         var start = self.read_pos
         for i in range(start, len(self._inner)):
             if is_newline(self._inner[i]):
@@ -285,7 +285,7 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
         return ret
 
     @always_inline
-    fn skip_whitespace(mut self):
+    def skip_whitespace(mut self):
         for i in range(self.read_pos, len(self._inner)):
             if is_space(self._inner[i]):
                 self.increment()
@@ -293,7 +293,7 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
                 break
 
     @always_inline
-    fn skip_carriage_return(mut self):
+    def skip_carriage_return(mut self):
         for i in range(self.read_pos, len(self._inner)):
             if self._inner[i] == BytesConstant.CR:
                 self.increment(2)
@@ -301,14 +301,14 @@ struct ByteReader[origin: ImmutOrigin](Copyable, Sized):
                 break
 
     @always_inline
-    fn increment(mut self, v: Int = 1):
+    def increment(mut self, v: Int = 1):
         self.read_pos += v
 
     @always_inline
-    fn consume(var self, bytes_len: Int = -1) -> Bytes:
+    def consume(var self, bytes_len: Int = -1) -> Bytes:
         return Bytes(self^._inner[self.read_pos : self.read_pos + len(self) + 1])
 
-fn create_string_from_ptr[origin: ImmutOrigin](ptr: UnsafePointer[UInt8, origin], length: Int) -> String:
+def create_string_from_ptr[origin: ImmutOrigin](ptr: UnsafePointer[UInt8, origin], length: Int) -> String:
     """Create a String from a pointer and length.
 
     Copies raw bytes directly into the String. NOTE: may result in invalid UTF-8 for bytes >= 0x80.
@@ -327,6 +327,6 @@ fn create_string_from_ptr[origin: ImmutOrigin](ptr: UnsafePointer[UInt8, origin]
     return result^
 
 
-fn bufis(s: String, t: String) -> Bool:
+def bufis(s: String, t: String) -> Bool:
     """Check if string s equals t."""
     return s == t

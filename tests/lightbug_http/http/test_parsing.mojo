@@ -35,7 +35,7 @@ struct ParseHeadersResult(Copyable, ImplicitlyCopyable):
     var num_headers: Int
 
 
-fn parse_request_test[
+def parse_request_test[
     origin: MutOrigin
 ](
     data: String, last_len: Int, headers: Span[HTTPHeader, origin]
@@ -64,7 +64,7 @@ fn parse_request_test[
     return result
 
 
-fn parse_response_test[
+def parse_response_test[
     origin: MutOrigin
 ](
     data: String, last_len: Int, headers: Span[HTTPHeader, origin]
@@ -93,7 +93,7 @@ fn parse_response_test[
     return result
 
 
-fn parse_headers_test[
+def parse_headers_test[
     origin: MutOrigin
 ](
     data: String, last_len: Int, headers: Span[HTTPHeader, origin]
@@ -115,7 +115,7 @@ fn parse_headers_test[
     return result
 
 
-fn test_request() raises:
+def test_request() raises:
     """Test HTTP request parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
@@ -128,7 +128,7 @@ fn test_request() raises:
     assert_equal(result.minor_version, 0)
 
 
-fn test_request_partial() raises:
+def test_request_partial() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Partial request
@@ -136,7 +136,7 @@ fn test_request_partial() raises:
     assert_equal(result.ret, -2)
 
 
-fn test_request_with_headers() raises:
+def test_request_with_headers() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Request with headers
@@ -155,7 +155,7 @@ fn test_request_with_headers() raises:
     assert_equal(headers[1].value, "")
 
 
-fn test_request_with_multiline_headers() raises:
+def test_request_with_multiline_headers() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Multiline headers
@@ -174,7 +174,7 @@ fn test_request_with_multiline_headers() raises:
     assert_equal(headers[2].value, "  \tc")
 
 
-fn test_request_invalid_header_trailing_space() raises:
+def test_request_invalid_header_trailing_space() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Invalid header name with trailing space
@@ -184,7 +184,7 @@ fn test_request_invalid_header_trailing_space() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_incomplete_request() raises:
+def test_request_incomplete_request() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Various incomplete requests
@@ -216,7 +216,7 @@ fn test_request_incomplete_request() raises:
     assert_equal(result.minor_version, 0)
 
 
-fn test_request_slowloris() raises:
+def test_request_slowloris() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Slowloris tests
@@ -244,7 +244,7 @@ fn test_request_slowloris() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_additional_spaces() raises:
+def test_request_additional_spaces() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Multiple spaces between tokens
@@ -252,7 +252,7 @@ fn test_request_additional_spaces() raises:
     assert_true(result.ret > 0)
 
 
-fn test_request_nul_in_method() raises:
+def test_request_nul_in_method() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Additional test cases from C version
@@ -262,7 +262,7 @@ fn test_request_nul_in_method() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_tab_in_method() raises:
+def test_request_tab_in_method() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Tab in method
@@ -270,7 +270,7 @@ fn test_request_tab_in_method() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_invalid_method() raises:
+def test_request_invalid_method() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Invalid method starting with colon
@@ -278,7 +278,7 @@ fn test_request_invalid_method() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_del_in_path() raises:
+def test_request_del_in_path() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # DEL in uri-path
@@ -286,7 +286,7 @@ fn test_request_del_in_path() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_invalid_header_name_char() raises:
+def test_request_invalid_header_name_char() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
     # Invalid char in header name
@@ -294,7 +294,7 @@ fn test_request_invalid_header_name_char() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_extended_chars() raises:
+def test_request_extended_chars() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # obs-text (0x80-0xFF) is explicitly permitted in header values per RFC 7230 §3.2.6
     result = parse_request_test(
@@ -309,7 +309,7 @@ fn test_request_extended_chars() raises:
     assert_equal(headers[0].value, "c\xa2y")
 
 
-fn test_request_tab_in_header_value() raises:
+def test_request_tab_in_header_value() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # HTAB (0x09) is explicitly permitted inside header field values per RFC 7230 §3.2.6
     result = parse_request_test(
@@ -321,7 +321,7 @@ fn test_request_tab_in_header_value() raises:
     assert_equal(headers[0].value, "bar\tbaz")
 
 
-fn test_request_control_char_in_header_value() raises:
+def test_request_control_char_in_header_value() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Control characters (< 0x20 except HTAB) in a header value must cause a parse error
     result = parse_request_test(
@@ -336,7 +336,7 @@ fn test_request_control_char_in_header_value() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_request_allowed_special_header_name_chars() raises:
+def test_request_allowed_special_header_name_chars() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Accept |~ (though forbidden by SSE)
     result = parse_request_test(
@@ -348,14 +348,14 @@ fn test_request_allowed_special_header_name_chars() raises:
     assert_equal(headers[0].value, "1")
 
 
-fn test_request_disallowed_special_header_name_chars() raises:
+def test_request_disallowed_special_header_name_chars() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Disallow {
     result = parse_request_test("GET / HTTP/1.0\r\n\x7b: 1\r\n\r\n", 0, headers)
     assert_equal(result.ret, -1)
 
 
-fn test_request_exclude_leading_trailing_spaces_in_header_value() raises:
+def test_request_exclude_leading_trailing_spaces_in_header_value() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Exclude leading and trailing spaces in header value
     result = parse_request_test(
@@ -365,7 +365,7 @@ fn test_request_exclude_leading_trailing_spaces_in_header_value() raises:
     assert_equal(headers[0].value, "a")
 
 
-fn test_response() raises:
+def test_response() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
@@ -378,7 +378,7 @@ fn test_response() raises:
     assert_equal(result.msg, "OK")
 
 
-fn test_partial_response() raises:
+def test_partial_response() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Partial response
@@ -386,7 +386,7 @@ fn test_partial_response() raises:
     assert_equal(result.ret, -2)
 
 
-fn test_response_with_headers() raises:
+def test_response_with_headers() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Response with headers
@@ -403,7 +403,7 @@ fn test_response_with_headers() raises:
     assert_equal(headers[1].value, "")
 
 
-fn test_500_response() raises:
+def test_500_response() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Internal server error
@@ -416,7 +416,7 @@ fn test_500_response() raises:
     assert_equal(result.msg, "Internal Server Error")
 
 
-fn test_incomplete_response() raises:
+def test_incomplete_response() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Various incomplete responses
@@ -442,7 +442,7 @@ fn test_incomplete_response() raises:
     assert_equal(result.ret, -2)
 
 
-fn test_response_accept_missing_trailing_whitespace() raises:
+def test_response_accept_missing_trailing_whitespace() raises:
     """Test HTTP response parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Accept missing trailing whitespace in status-line
@@ -451,7 +451,7 @@ fn test_response_accept_missing_trailing_whitespace() raises:
     assert_equal(result.msg, "")
 
 
-fn test_response_invalid() raises:
+def test_response_invalid() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Invalid responses
     result = parse_response_test("HTTP/1. 200 OK\r\n\r\n", 0, headers)
@@ -464,7 +464,7 @@ fn test_response_invalid() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_response_garbage_after_status() raises:
+def test_response_garbage_after_status() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Garbage after status code
     result = parse_response_test("HTTP/1.1 200X\r\n\r\n", 0, headers)
@@ -477,7 +477,7 @@ fn test_response_garbage_after_status() raises:
     assert_equal(result.ret, -1)
 
 
-fn test_response_exclude_leading_and_trailing_spaces_in_header_value() raises:
+def test_response_exclude_leading_and_trailing_spaces_in_header_value() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Exclude leading and trailing spaces in header value
     result = parse_response_test(
@@ -487,14 +487,14 @@ fn test_response_exclude_leading_and_trailing_spaces_in_header_value() raises:
     assert_equal(headers[0].value, "b")
 
 
-fn test_response_accept_multiple_spaces_between_tokens() raises:
+def test_response_accept_multiple_spaces_between_tokens() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Accept multiple spaces between tokens
     result = parse_response_test("HTTP/1.1   200   OK\r\n\r\n", 0, headers)
     assert_true(result.ret > 0)
 
 
-fn test_response_with_multiline_headers() raises:
+def test_response_with_multiline_headers() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Multiline headers
     result = parse_response_test(
@@ -512,7 +512,7 @@ fn test_response_with_multiline_headers() raises:
     assert_equal(headers[2].value, "  \tc")
 
 
-fn test_response_slowloris() raises:
+def test_response_slowloris() raises:
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Slowloris tests
     var test_str = "HTTP/1.0 200 OK\r\n\r"
@@ -526,7 +526,7 @@ fn test_response_slowloris() raises:
     assert_true(result.ret > 0)
 
 
-fn test_headers() raises:
+def test_headers() raises:
     """Test header parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
 
@@ -542,7 +542,7 @@ fn test_headers() raises:
     assert_equal(headers[1].value, "")
 
 
-fn test_headers_slowloris() raises:
+def test_headers_slowloris() raises:
     """Test header parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Slowloris test
@@ -553,7 +553,7 @@ fn test_headers_slowloris() raises:
     assert_true(result.ret > 0)
 
 
-fn test_headers_partial() raises:
+def test_headers_partial() raises:
     """Test header parsing."""
     var headers = InlineArray[HTTPHeader, 4](fill=HTTPHeader())
     # Partial headers
@@ -563,5 +563,5 @@ fn test_headers_partial() raises:
     assert_equal(result.ret, -2)
 
 
-fn main() raises:
+def main() raises:
     TestSuite.discover_tests[__functions_in_module()]().run()

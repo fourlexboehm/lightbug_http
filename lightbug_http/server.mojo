@@ -40,30 +40,30 @@ struct ServerError(Movable, Writable):
     var value: Self.type
 
     @implicit
-    fn __init__(out self, var value: ListenerError):
+    def __init__(out self, var value: ListenerError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: ProvisionError):
+    def __init__(out self, var value: ProvisionError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: SocketAcceptError):
+    def __init__(out self, var value: SocketAcceptError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: SocketRecvError):
+    def __init__(out self, var value: SocketRecvError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: FatalCloseError):
+    def __init__(out self, var value: FatalCloseError):
         self.value = value^
 
     @implicit
-    fn __init__(out self, var value: Error):
+    def __init__(out self, var value: Error):
         self.value = value^
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         if self.value.isa[ListenerError]():
             writer.write(self.value[ListenerError])
         elif self.value.isa[ProvisionError]():
@@ -77,13 +77,13 @@ struct ServerError(Movable, Writable):
         elif self.value.isa[Error]():
             writer.write(self.value[Error])
 
-    fn isa[T: AnyType](self) -> Bool:
+    def isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
 
-    fn __getitem__[T: AnyType](self) -> ref [self.value] T:
+    def __getitem__[T: AnyType](self) -> ref [self.value] T:
         return self.value[T]
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -109,7 +109,7 @@ struct ServerConfig(Copyable, Movable):
     var max_request_uri_length: Int
     """Maximum URI length."""
 
-    fn __init__(out self):
+    def __init__(out self):
         self.max_connections = 1024
         self.max_keepalive_requests = 0
 
@@ -168,7 +168,7 @@ struct ConnectionProvision(Movable):
     var should_close: Bool
     """Whether to close connection after response."""
 
-    fn __init__(out self, config: ServerConfig):
+    def __init__(out self, config: ServerConfig):
         self.recv_buffer = Bytes(capacity=config.socket_buffer_size)
         self.parsed_headers = None
         self.request = None
@@ -179,7 +179,7 @@ struct ConnectionProvision(Movable):
         self.keepalive_count = 0
         self.should_close = False
 
-    fn prepare_for_new_request(mut self):
+    def prepare_for_new_request(mut self):
         """Reset provision for next request in keepalive connection."""
         self.parsed_headers = None
         self.request = None
@@ -195,10 +195,10 @@ struct ConnectionProvision(Movable):
 struct ProvisionPoolExhaustedError(CustomError, TrivialRegisterPassable):
     comptime message = "ProvisionError: Connection provision pool exhausted"
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(self.message)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -210,19 +210,19 @@ struct ProvisionError(Movable, Writable):
     var value: Self.type
 
     @implicit
-    fn __init__(out self, value: ProvisionPoolExhaustedError):
+    def __init__(out self, value: ProvisionPoolExhaustedError):
         self.value = value
 
-    fn write_to[W: Writer, //](self, mut writer: W):
+    def write_to[W: Writer, //](self, mut writer: W):
         writer.write(self.value[ProvisionPoolExhaustedError])
 
-    fn isa[T: AnyType](self) -> Bool:
+    def isa[T: AnyType](self) -> Bool:
         return self.value.isa[T]()
 
-    fn __getitem__[T: AnyType](self) -> ref [self.value] T:
+    def __getitem__[T: AnyType](self) -> ref [self.value] T:
         return self.value[T]
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
 
@@ -234,7 +234,7 @@ struct ProvisionPool(Movable):
     var capacity: Int
     var initialized_count: Int
 
-    fn __init__(out self, capacity: Int, config: ServerConfig):
+    def __init__(out self, capacity: Int, config: ServerConfig):
         self.provisions = OwningList[ConnectionProvision](capacity=capacity)
         self.available = OwningList[Int](capacity=capacity)
         self.capacity = capacity
@@ -245,22 +245,22 @@ struct ProvisionPool(Movable):
             self.available.append(i)
             self.initialized_count += 1
 
-    fn borrow(mut self) raises ProvisionError -> Int:
+    def borrow(mut self) raises ProvisionError -> Int:
         if len(self.available) == 0:
             raise ProvisionPoolExhaustedError()
         return self.available.pop()
 
-    fn release(mut self, index: Int):
+    def release(mut self, index: Int):
         self.available.append(index)
 
-    fn get_ptr(mut self, index: Int) -> Pointer[ConnectionProvision, origin_of(self.provisions)]:
+    def get_ptr(mut self, index: Int) -> Pointer[ConnectionProvision, origin_of(self.provisions)]:
         return Pointer(to=self.provisions[index])
 
-    fn size(self) -> Int:
+    def size(self) -> Int:
         return self.initialized_count - len(self.available)
 
 
-fn handle_connection[
+def handle_connection[
     T: HTTPService
 ](
     mut conn: TCPConnection[NetworkType.tcp4],
@@ -484,13 +484,13 @@ struct SyncExecutor[T: HTTPService](Movable):
     var server_address: String
     var tcp_keep_alive: Bool
 
-    fn __init__(out self, config: ServerConfig, server_address: String, tcp_keep_alive: Bool):
+    def __init__(out self, config: ServerConfig, server_address: String, tcp_keep_alive: Bool):
         self.provision_pool = ProvisionPool(config.max_connections, config)
         self.config = config.copy()
         self.server_address = server_address
         self.tcp_keep_alive = tcp_keep_alive
 
-    fn execute(mut self, var conn: TCPConnection[NetworkType.tcp4], mut handler: Self.T):
+    def execute(mut self, var conn: TCPConnection[NetworkType.tcp4], mut handler: Self.T):
         var index: Int
         try:
             index = self.provision_pool.borrow()
@@ -529,7 +529,7 @@ struct Server(Movable):
     var _address: String
     var tcp_keep_alive: Bool
 
-    fn __init__(
+    def __init__(
         out self,
         var address: String = "127.0.0.1",
         tcp_keep_alive: Bool = False,
@@ -538,7 +538,7 @@ struct Server(Movable):
         self._address = address^
         self.tcp_keep_alive = tcp_keep_alive
 
-    fn __init__(
+    def __init__(
         out self,
         var config: ServerConfig,
         var address: String = "127.0.0.1",
@@ -548,25 +548,25 @@ struct Server(Movable):
         self._address = address^
         self.tcp_keep_alive = tcp_keep_alive
 
-    fn address(self) -> ref [self._address] String:
+    def address(self) -> ref [self._address] String:
         return self._address
 
-    fn set_address(mut self, var own_address: String):
+    def set_address(mut self, var own_address: String):
         self._address = own_address^
 
-    fn max_request_body_size(self) -> Int:
+    def max_request_body_size(self) -> Int:
         return self.config.max_request_body_size
 
-    fn set_max_request_body_size(mut self, size: Int):
+    def set_max_request_body_size(mut self, size: Int):
         self.config.max_request_body_size = size
 
-    fn max_request_uri_length(self) -> Int:
+    def max_request_uri_length(self) -> Int:
         return self.config.max_request_uri_length
 
-    fn set_max_request_uri_length(mut self, length: Int):
+    def set_max_request_uri_length(mut self, length: Int):
         self.config.max_request_uri_length = length
 
-    fn listen_and_serve[T: HTTPService](mut self, address: StringSlice, mut handler: T) raises ServerError:
+    def listen_and_serve[T: HTTPService](mut self, address: StringSlice, mut handler: T) raises ServerError:
         """Listen for incoming connections and serve HTTP requests.
 
         Parameters:
@@ -592,7 +592,7 @@ struct Server(Movable):
         except server_err:
             raise server_err^
 
-    fn serve[T: HTTPService](self, ln: NoTLSListener[NetworkType.tcp4], mut handler: T) raises ServerError:
+    def serve[T: HTTPService](self, ln: NoTLSListener[NetworkType.tcp4], mut handler: T) raises ServerError:
         """Serve HTTP requests from an existing listener using the default single-threaded executor.
 
         Parameters:
@@ -608,7 +608,7 @@ struct Server(Movable):
         var executor = SyncExecutor[T](self.config, self._address, self.tcp_keep_alive)
         self.serve_with_executor(ln, handler, executor)
 
-    fn serve_with_executor[
+    def serve_with_executor[
         T: HTTPService,
     ](self, ln: NoTLSListener[NetworkType.tcp4], mut handler: T, mut executor: SyncExecutor[T]) raises ServerError:
         """Serve HTTP requests using a custom executor for connection dispatch.
@@ -635,7 +635,7 @@ struct Server(Movable):
             executor.execute(conn^, handler)
 
 
-fn _send_error_response(mut conn: TCPConnection[NetworkType.tcp4], var response: HTTPResponse):
+def _send_error_response(mut conn: TCPConnection[NetworkType.tcp4], var response: HTTPResponse):
     """Helper to send an error response, ignoring write errors."""
     try:
         _ = conn.write(encode(response^))

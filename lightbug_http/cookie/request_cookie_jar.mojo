@@ -1,23 +1,21 @@
 from lightbug_http.header import HeaderKey, write_header
 from lightbug_http.io.bytes import ByteWriter
 from lightbug_http.strings import lineBreak
-from small_time import SmallTime, TimeZone
-from small_time.small_time import parse_time_with_format
 
 
 @fieldwise_init
 struct RequestCookieJar(Copyable, Writable):
     var _inner: Dict[String, String]
 
-    fn __init__(out self):
+    def __init__(out self):
         self._inner = Dict[String, String]()
 
-    fn __init__(out self, *cookies: Cookie):
+    def __init__(out self, *cookies: Cookie):
         self._inner = Dict[String, String]()
         for cookie in cookies:
             self._inner[cookie.name] = cookie.value
 
-    fn parse_cookies(mut self, headers: Headers) raises:
+    def parse_cookies(mut self, headers: Headers) raises:
         var cookie_header = headers.get(HeaderKey.COOKIE)
         if not cookie_header:
             return None
@@ -36,27 +34,27 @@ struct RequestCookieJar(Copyable, Writable):
             self._inner[key] = String(value)
 
     @always_inline
-    fn empty(self) -> Bool:
+    def empty(self) -> Bool:
         return len(self._inner) == 0
 
     @always_inline
-    fn __contains__(self, key: String) -> Bool:
+    def __contains__(self, key: String) -> Bool:
         return key in self._inner
 
-    fn __contains__(self, key: Cookie) -> Bool:
+    def __contains__(self, key: Cookie) -> Bool:
         return key.name in self
 
     @always_inline
-    fn __getitem__(self, key: String) raises -> String:
+    def __getitem__(self, key: String) raises -> String:
         return self._inner[key.lower()]
 
-    fn get(self, key: String) -> Optional[String]:
+    def get(self, key: String) -> Optional[String]:
         try:
             return self[key]
         except:
             return Optional[String](None)
 
-    fn to_header(self) -> Optional[Header]:
+    def to_header(self) -> Optional[Header]:
         comptime equal = "="
         if len(self._inner) == 0:
             return None
@@ -66,20 +64,20 @@ struct RequestCookieJar(Copyable, Writable):
             header_value.append(cookie.key + equal + cookie.value)
         return Header(HeaderKey.COOKIE, StaticString("; ").join(header_value))
 
-    fn encode_to(mut self, mut writer: ByteWriter):
+    def encode_to(mut self, mut writer: ByteWriter):
         var header = self.to_header()
         if header:
             write_header(writer, header.value().key, header.value().value)
 
-    fn write_to[T: Writer](self, mut writer: T):
+    def write_to[T: Writer](self, mut writer: T):
         var header = self.to_header()
         if header:
             write_header(writer, header.value().key, header.value().value)
 
-    fn __str__(self) -> String:
+    def __str__(self) -> String:
         return String.write(self)
 
-    fn __eq__(self, other: RequestCookieJar) -> Bool:
+    def __eq__(self, other: RequestCookieJar) -> Bool:
         if len(self._inner) != len(other._inner):
             return False
 

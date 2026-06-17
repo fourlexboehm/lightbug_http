@@ -11,7 +11,7 @@ from lightbug_http.http.json import Json
 struct Message(Movable, Defaultable):
     var text: String
 
-    fn __init__(out self):
+    def __init__(out self):
         self.text = ""
 
 
@@ -20,7 +20,7 @@ struct Point(Movable, Defaultable):
     var x: Int
     var y: Int
 
-    fn __init__(out self):
+    def __init__(out self):
         self.x = 0
         self.y = 0
 

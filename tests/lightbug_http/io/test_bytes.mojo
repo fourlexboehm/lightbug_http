@@ -2,7 +2,7 @@ import testing
 from lightbug_http.io.bytes import Bytes, ByteView
 
 
-fn test_string_literal_to_bytes() raises:
+def test_string_literal_to_bytes() raises:
     var cases = Dict[StaticString, Bytes]()
     cases[""] = Bytes()
     cases["Hello world!"] = [
@@ -44,7 +44,7 @@ fn test_string_literal_to_bytes() raises:
         testing.assert_equal(c.key, String(unsafe_from_utf8=c.value))
 
 
-fn test_string_to_bytes() raises:
+def test_string_to_bytes() raises:
     var cases = Dict[String, Bytes]()
     cases[String("")] = Bytes()
     cases[String("Hello world!")] = [
